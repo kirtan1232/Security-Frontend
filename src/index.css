@@ -1,0 +1,10 @@
+/* index.css */
+
+@tailwind base; /* Includes Tailwind's base styles */
+@tailwind components; /* Includes Tailwind's component styles */
+@tailwind utilities; /* Includes Tailwind's utility styles */
+
+/* Custom global styles */
+body {
+  @apply m-0; /* Removes margin using Tailwind utility */
+}
