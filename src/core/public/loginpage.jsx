@@ -7,7 +7,9 @@ import loginSound from "../../assets/audio/intro.m4a";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// eslint-disable-next-line react/prop-types
+// Get API base URL from env
+const API_URL = import.meta.env.VITE_API_URL;
+
 const LoginPage = ({ setIsAuthenticated, setIsAdmin }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -15,13 +17,10 @@ const LoginPage = ({ setIsAuthenticated, setIsAdmin }) => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    // Check if the token is already in localStorage on component mount
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
-            // If a token exists, set the headers for axios
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            // Redirect to dashboard for all users
             const role = localStorage.getItem("role");
             if (role) {
                 setIsAuthenticated(true);
@@ -37,61 +36,38 @@ const LoginPage = ({ setIsAuthenticated, setIsAdmin }) => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-
         if (!email || !password) {
-            toast.error("Please fill in both fields.", {
-                position: "top-right",
-                autoClose: 3000,
-            });
+            toast.error("Please fill in both fields.");
             return;
         }
-
         if (loading) return;
-
         setLoading(true);
-
         try {
             delete axios.defaults.headers.common['Authorization'];
-
             const response = await axios.post(
-                "https://localhost:3000/api/auth/login",
+                `${API_URL}/auth/login`,
                 { email, password }
             );
-
             const { token, role } = response.data;
-
             localStorage.setItem("token", token);
             localStorage.setItem("role", role);
-
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
             setIsAuthenticated(true);
             setIsAdmin(role === "admin");
-
             const audio = new Audio(loginSound);
             audio.play().catch((error) => {
                 console.error("Error playing login sound:", error);
             });
-
-            toast.success("Login successful!", {
-                position: "top-right",
-                autoClose: 1500,
-            });
-
+            toast.success("Login successful!", { autoClose: 1500 });
             navigate("/dashboard");
         } catch (error) {
-            console.error("Login error: ", error);
             if (error.response && error.response.status === 401) {
-                toast.error("Invalid email or password.", {
-                    position: "top-right",
-                    autoClose: 3000,
-                });
+                toast.error("Invalid email or password.");
+            } else if (error.response && error.response.status === 403) {
+                toast.error(error.response.data.message || "Account locked. Try again later.");
             } else {
                 const errorMsg = error?.response?.data?.message || "Error logging in. Please try again.";
-                toast.error(errorMsg, {
-                    position: "top-right",
-                    autoClose: 3000,
-                });
+                toast.error(errorMsg);
             }
         } finally {
             setLoading(false);
