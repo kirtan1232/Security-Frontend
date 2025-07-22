@@ -5,7 +5,7 @@ import Footer from "../../components/footer.jsx";
 import Sidebar from "../../components/sidebar.jsx";
 
 export default function Dashboard() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
@@ -14,11 +14,6 @@ export default function Dashboard() {
   );
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-
-  const toggleLanguage = () => {
-    const newLang = i18n.language === "en" ? "ne" : "en";
-    i18n.changeLanguage(newLang);
-  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -91,9 +86,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div
-      className={`flex flex-col min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 ${i18n.language === "ne" ? "font-noto-sans" : ""}`}
-    >
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900">
       {/* Animated background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-10 left-10 w-64 h-64 bg-purple-800 rounded-full opacity-20 animate-pulse"></div>
@@ -140,24 +133,6 @@ export default function Dashboard() {
                   </p>
                 </div>
               </div>
-              <button
-                onClick={toggleLanguage}
-                className="group relative overflow-hidden py-3 px-6 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 rounded-xl text-white font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative flex items-center space-x-2">
-                  <img
-                    src={
-                      i18n.language === "en"
-                        ? "src/assets/images/us-flag.PNG"
-                        : "src/assets/images/nepal-flag.png"
-                    }
-                    alt={i18n.language === "en" ? "Nepal Flag" : "US Flag"}
-                    className="w-6 h-4 rounded-sm"
-                  />
-                  <span>{t("Change Language")}</span>
-                </div>
-              </button>
             </header>
 
             {/* Enhanced Main Feature Card */}
@@ -232,7 +207,7 @@ export default function Dashboard() {
                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/20 to-teal-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="overflow-hidden rounded-2xl">
                   <img
-                    src="src/assets/images/pick.jpg"
+                    src="src/assets/images/tuner.PNG"
                     alt="Tune your instrument"
                     className="absolute top-0 left-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
                   />
