@@ -220,7 +220,7 @@ const TunerComponent = () => {
         await tunerInstance.init();
         tunerRef.current = tunerInstance;
         
-        Swal.fire("Welcome to the Anna tuner!");
+        Swal.fire("Welcome to Soundwise tuner!");
       } catch (error) {
         console.error("Tuner initialization failed:", error);
         alert("Failed to initialize tuner: " + error.message);
