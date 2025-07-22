@@ -156,7 +156,7 @@ const SupportPayment = () => {
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent dark:from-purple-400 dark:to-blue-400">
                   Hello, {userProfile ? userProfile.name : "User"}
                 </h1>
-                <p className="text-gray-600 dark:text-gray-300 mt-1">Support Anna's musical journey</p>
+                <p className="text-gray-600 dark:text-gray-300 mt-1">Support Soundwise's musical journey</p>
               </div>
             </header>
 
@@ -168,7 +168,7 @@ const SupportPayment = () => {
                     <div className="flex items-center mb-6">
                       <FaMusic className="text-purple-500 text-2xl mr-3" />
                       <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-                        About Anna
+                        About Soundwise
                       </h2>
                     </div>
                     
@@ -189,7 +189,7 @@ const SupportPayment = () => {
                         <p>
                           I also offer a special song request feature, where you can
                           ask for your favorite song's chords, and I'll do my best to
-                          post it for you. Your support on Anna helps me keep this
+                          post it for you. Your support on Soundwise helps me keep this
                           project going, ensuring I can continue creating valuable
                           content and fulfilling song requests.
                         </p>
@@ -225,7 +225,7 @@ const SupportPayment = () => {
                     <div className="flex items-center justify-center mb-6">
                       <FaCoffee className="text-4xl text-amber-600 mr-3 animate-pulse" />
                       <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-                        Buy Anna a Coffee
+                        Buy Soundwise a Coffee
                       </h2>
                     </div>
                     
