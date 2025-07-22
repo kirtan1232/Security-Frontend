@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faLock, faEye, faEyeSlash, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
@@ -61,7 +61,16 @@ const LoginPage = ({ setIsAuthenticated, setIsAdmin }) => {
             toast.success("Login successful!", { autoClose: 1500 });
             navigate("/dashboard");
         } catch (error) {
-            if (error.response && error.response.status === 401) {
+            if (
+                error.response &&
+                error.response.status === 403 &&
+                error.response.data.message === "Please verify your email."
+            ) {
+                // Redirect to OTP page with userId and email in state
+                toast.info("Please verify your email. Check your inbox for the OTP.");
+                const userId = error.response.data.userId;
+                navigate("/otp", { state: { userId, email } });
+            } else if (error.response && error.response.status === 401) {
                 toast.error("Invalid email or password.");
             } else if (error.response && error.response.status === 403) {
                 toast.error(error.response.data.message || "Account locked. Try again later.");

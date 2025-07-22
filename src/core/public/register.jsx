@@ -31,7 +31,6 @@ const RegisterPage = () => {
         const newPassword = e.target.value;
         setPassword(newPassword);
         const result = zxcvbn(newPassword);
-        console.log("Password:", newPassword, "Score:", result.score, "Feedback:", result.feedback); // Debugging
         setPasswordScore(result.score);
     };
 
@@ -58,8 +57,9 @@ const RegisterPage = () => {
                 role: "user",
             });
             if (response.status === 201) {
-                toast.success("User registered successfully!");
-                navigate("/login");
+                // Backend should return: { message: 'User registered successfully. Please check your email for OTP.', userId: ... }
+                toast.success("Account created! Please check your email for a 6-digit OTP to verify your email.");
+                navigate("/otp", { state: { userId: response.data.userId, email: email } });
             }
         } catch (err) {
             const message = err.response?.data?.message || "Error registering user. Please try again.";
