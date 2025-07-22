@@ -4,32 +4,34 @@ import { useTheme } from "../../components/ThemeContext";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Sidebar from "../../components/sidebar.jsx";
+import zxcvbn from "zxcvbn";
 
 export default function Profile() {
     const { theme } = useTheme();
     const navigate = useNavigate();
-    const [user, setUser] = useState({ 
-        name: "", 
-        email: "", 
+    const [user, setUser] = useState({
+        name: "",
+        email: "",
         about: ""
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [oldPassword, setOldPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [passwordScore, setPasswordScore] = useState(0);
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
 
+    // Fetch user profile
     useEffect(() => {
         const fetchProfile = async () => {
             try {
                 const token = localStorage.getItem("token");
                 if (!token) {
-                    console.warn("No token found, redirecting to login.");
                     navigate("/login");
                     return;
                 }
-
                 const response = await fetch("https://localhost:3000/api/auth/profile", {
                     method: "GET",
                     headers: {
@@ -40,10 +42,8 @@ export default function Profile() {
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    console.error("Error fetching profile:", errorData);
                     throw new Error(errorData.message || "Failed to fetch profile");
                 }
-
                 const data = await response.json();
                 setUser({
                     name: data.name || "",
@@ -59,7 +59,6 @@ export default function Profile() {
                 setLoading(false);
             }
         };
-
         fetchProfile();
     }, [navigate]);
 
@@ -71,23 +70,42 @@ export default function Profile() {
         }
     }, [image]);
 
+    // Security - handle password strength meter
+    const handleNewPasswordChange = (e) => {
+        setNewPassword(e.target.value);
+        setPasswordScore(zxcvbn(e.target.value).score);
+    };
+
+    // File upload security: only allow images, max 2MB
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
+            const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+            if (!allowedTypes.includes(file.type)) {
+                toast.error("Only JPG, PNG, or WEBP images are allowed.");
+                return;
+            }
+            if (file.size > 2 * 1024 * 1024) {
+                toast.error("Profile picture must be less than 2MB.");
+                return;
+            }
             setImage(file);
         }
     };
 
+    // Secure password change
     const handlePasswordChange = async () => {
-        if (!newPassword || !confirmPassword) {
-            toast.error("Please fill in all password fields", {
-                position: "top-right",
-                autoClose: 3000,
-            });
+        setError("");
+        if (!oldPassword || !newPassword || !confirmPassword) {
+            toast.error("Please fill in all password fields", { position: "top-right", autoClose: 3000 });
             return;
         }
         if (newPassword !== confirmPassword) {
             setError("New passwords do not match!");
+            return;
+        }
+        if (passwordScore < 2) {
+            setError("Password is too weak! Try a mix of letters, numbers, symbols, and make it longer.");
             return;
         }
 
@@ -98,6 +116,7 @@ export default function Profile() {
         }
 
         const formData = new FormData();
+        formData.append("oldPassword", oldPassword);
         formData.append("newPassword", newPassword);
 
         try {
@@ -114,9 +133,10 @@ export default function Profile() {
 
             toast.success("Password updated successfully!", {
                 position: "top-right",
-                autoClose: 500,
+                autoClose: 1000,
                 onClose: () => navigate("/dashboard")
             });
+            setOldPassword("");
             setNewPassword("");
             setConfirmPassword("");
             setError("");
@@ -129,6 +149,12 @@ export default function Profile() {
         e.preventDefault();
         setError("");
 
+        // Input validation
+        if (!user.name.trim() || !user.email.trim()) {
+            toast.error("Name and email are required.", { autoClose: 3000 });
+            return;
+        }
+
         const token = localStorage.getItem("token");
         if (!token) {
             navigate("/login");
@@ -136,9 +162,9 @@ export default function Profile() {
         }
 
         const formData = new FormData();
-        formData.append("name", user.name);
-        formData.append("email", user.email);
-        formData.append("about", user.about);
+        formData.append("name", user.name.trim());
+        formData.append("email", user.email.trim());
+        formData.append("about", user.about.trim());
         if (image) formData.append("profilePicture", image);
 
         try {
@@ -156,16 +182,16 @@ export default function Profile() {
             const data = await response.json();
             toast.success("Profile updated successfully!", {
                 position: "top-right",
-                autoClose: 500,
+                autoClose: 1000,
                 onClose: () => navigate("/dashboard")
             });
             setUser({
-                name: data.name || "",
-                email: data.email || "",
-                about: data.about || ""
+                name: data.user.name || "",
+                email: data.user.email || "",
+                about: data.user.about || ""
             });
             setImage(null);
-            setImagePreview(data.profilePicture ? `https://localhost:3000/${data.profilePicture}` : null);
+            setImagePreview(data.user.profilePicture ? `https://localhost:3000/${data.user.profilePicture}` : null);
         } catch (err) {
             setError(err.message || "Error updating profile");
         }
@@ -194,10 +220,9 @@ export default function Profile() {
                         {/* Profile Overview Card */}
                         <div className={`bg-white bg-opacity-60 backdrop-blur-lg dark:bg-gray-800 dark:bg-opacity-80 rounded-3xl shadow-lg p-6 ${theme === 'light' ? 'text-black' : 'text-white'}`}>
                             <h2 className="text-xl font-semibold mb-6">Profile Overview</h2>
-                            
                             <div className="flex flex-col items-center mb-6">
                                 <div className="relative">
-                                    <div 
+                                    <div
                                         onClick={() => document.getElementById("fileInput").click()}
                                         className={`w-16 h-16 rounded-full bg-white flex items-center justify-center cursor-pointer border-4 ${theme === 'light' ? 'border-gray-300' : 'border-gray-600'} overflow-hidden`}
                                     >
@@ -217,12 +242,10 @@ export default function Profile() {
                                 </div>
                                 <input id="fileInput" type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                             </div>
-
                             <div className="text-center mb-6">
                                 <h3 className="text-lg font-semibold">{user.name || "User"}</h3>
                                 <p className={`${theme === 'light' ? 'text-gray-800' : 'text-gray-200'} text-sm`}>{user.email}</p>
                             </div>
-
                             {/* Security Settings */}
                             <div className={`${theme === 'light' ? 'bg-gray-100' : 'bg-gray-700 bg-opacity-50'} rounded-xl p-4 mb-4`}>
                                 <div className="flex items-center mb-3">
@@ -231,8 +254,18 @@ export default function Profile() {
                                     </svg>
                                     <h4 className="font-semibold">Security Settings</h4>
                                 </div>
-                                
                                 <div className="space-y-3">
+                                    <div>
+                                        <label className={`block text-sm ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'} mb-1`}>Current Password</label>
+                                        <input
+                                            type="password"
+                                            className={`w-full p-2 rounded-lg ${theme === 'light' ? 'bg-white text-black border-gray-300' : 'bg-gray-600 bg-opacity-50 text-white border-gray-500'} border focus:border-gray-400 focus:outline-none`}
+                                            placeholder="Enter current password"
+                                            value={oldPassword}
+                                            onChange={(e) => setOldPassword(e.target.value)}
+                                            autoComplete="current-password"
+                                        />
+                                    </div>
                                     <div>
                                         <label className={`block text-sm ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'} mb-1`}>New Password</label>
                                         <input
@@ -240,8 +273,28 @@ export default function Profile() {
                                             className={`w-full p-2 rounded-lg ${theme === 'light' ? 'bg-white text-black border-gray-300' : 'bg-gray-600 bg-opacity-50 text-white border-gray-500'} border focus:border-gray-400 focus:outline-none`}
                                             placeholder="Enter new password"
                                             value={newPassword}
-                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            onChange={handleNewPasswordChange}
+                                            autoComplete="new-password"
                                         />
+                                        {/* Password Strength Meter */}
+                                        {newPassword && (
+                                            <div className="mt-1">
+                                                <div className="w-full bg-gray-400 rounded-full h-2">
+                                                    <div
+                                                        className={`h-2 rounded-full transition-all duration-300 ${
+                                                            passwordScore === 0 ? "w-0" :
+                                                            passwordScore === 1 ? "w-1/4 bg-red-500" :
+                                                            passwordScore === 2 ? "w-2/4 bg-yellow-500" :
+                                                            passwordScore === 3 ? "w-3/4 bg-blue-500" :
+                                                            "w-full bg-green-500"
+                                                        }`}
+                                                    ></div>
+                                                </div>
+                                                <div className="text-xs text-gray-300 mt-1">
+                                                    {["Very Weak", "Weak", "Fair", "Good", "Strong"][passwordScore]}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                     <div>
                                         <label className={`block text-sm ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'} mb-1`}>Confirm New Password</label>
@@ -251,69 +304,67 @@ export default function Profile() {
                                             placeholder="Confirm new password"
                                             value={confirmPassword}
                                             onChange={(e) => setConfirmPassword(e.target.value)}
+                                            autoComplete="new-password"
                                         />
                                     </div>
                                     <div className="flex justify-center">
-                                        <button 
+                                        <button
+                                            type="button"
                                             onClick={handlePasswordChange}
                                             className="max-w-sm py-2 px-5 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 rounded-lg text-white font-semibold transition-all duration-300 shadow-lg text-sm"
                                         >
                                             Change Password
                                         </button>
                                     </div>
+                                    {error && <div className="text-center text-sm text-red-600 mt-2">{error}</div>}
                                 </div>
                             </div>
                         </div>
-
                         {/* Personal Information Card */}
                         <div className={`bg-white bg-opacity-60 backdrop-blur-lg dark:bg-gray-800 dark:bg-opacity-80 rounded-3xl shadow-lg p-6 ${theme === 'light' ? 'text-black' : 'text-white'}`}>
                             <h2 className="text-xl font-semibold mb-2">Personal Information</h2>
                             <p className={`${theme === 'light' ? 'text-gray-700' : 'text-gray-200'} text-sm mb-6`}>Your basic profile details</p>
-
-                            <div className="space-y-4">
+                            <form onSubmit={handleUpdate} className="space-y-4">
                                 <div>
                                     <label className={`block text-sm ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'} mb-1`}>Full Name</label>
                                     <input
                                         type="text"
                                         className={`w-full p-3 rounded-lg ${theme === 'light' ? 'bg-white text-black border-gray-300' : 'bg-gray-600 bg-opacity-50 text-white border-gray-500'} border focus:border-gray-400 focus:outline-none`}
                                         value={user.name}
-                                        onChange={(e) => setUser(prev => ({...prev, name: e.target.value}))}
+                                        onChange={(e) => setUser(prev => ({ ...prev, name: e.target.value }))}
+                                        autoComplete="name"
                                     />
                                 </div>
-
                                 <div>
                                     <label className={`block text-sm ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'} mb-1`}>Email Address</label>
                                     <input
                                         type="email"
                                         className={`w-full p-3 rounded-lg ${theme === 'light' ? 'bg-white text-black border-gray-300' : 'bg-gray-600 bg-opacity-50 text-white border-gray-500'} border focus:border-gray-400 focus:outline-none`}
                                         value={user.email}
-                                        onChange={(e) => setUser(prev => ({...prev, email: e.target.value}))}
+                                        onChange={(e) => setUser(prev => ({ ...prev, email: e.target.value }))}
+                                        autoComplete="email"
                                     />
                                 </div>
-
                                 <div>
                                     <label className={`block text-sm ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'} mb-1`}>About You</label>
                                     <textarea
                                         className={`w-full p-3 rounded-lg ${theme === 'light' ? 'bg-white text-black border-gray-300' : 'bg-gray-600 bg-opacity-50 text-white border-gray-500'} border focus:border-gray-400 focus:outline-none h-32 resize-none`}
                                         placeholder="Tell potential collaborators about your background, interests, and what you're working on..."
                                         value={user.about}
-                                        onChange={(e) => setUser(prev => ({...prev, about: e.target.value}))}
+                                        onChange={(e) => setUser(prev => ({ ...prev, about: e.target.value }))}
                                     />
                                 </div>
-
-                                {/* Update Button */}
                                 <div className="pt-4 border-t border-gray-300 dark:border-gray-600 flex justify-center">
-                                    <button 
-                                        onClick={handleUpdate}
+                                    <button
+                                        type="submit"
                                         className="max-w-sm py-2 px-5 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 rounded-lg text-white font-semibold transition-all duration-300 shadow-lg text-sm"
                                     >
                                         Update Profile
                                     </button>
                                 </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
-
                     {error && (
                         <div className={`mt-4 p-4 ${theme === 'light' ? 'bg-red-100 border-red-300 text-red-600' : 'bg-red-900 bg-opacity-50 border-red-600 text-red-200'} border rounded-lg text-center max-w-6xl mx-auto`}>
                             {error}
