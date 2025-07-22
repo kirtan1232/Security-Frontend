@@ -191,7 +191,7 @@ export default function LikedSongs() {
                         />
                     ) : (
                         <img
-                            src="src/assets/images/profile.png"
+                            src="/profile.png"
                             alt="Profile"
                             className="w-16 h-16 rounded-full border border-gray-300 dark:border-gray-600 cursor-pointer transition-transform duration-200 hover:scale-110"
                             onClick={() => navigate("/profile")}

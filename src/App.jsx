@@ -24,6 +24,7 @@ import SongDetails from "./core/public/songDetails.jsx";
 import TunerInst from "./core/public/tunerInst.jsx";
 import Success from "./components/success.jsx";
 import Payment from "./core/public/payment.jsx";
+import OtpPage from "./core/public/otp.jsx";
 import './i18n.js'; // Import i18n for translations
 
 function App() {
@@ -72,6 +73,7 @@ function App() {
     { path: "/liked-songs", element: <LikedSongs /> },
     { path: "/success", element: <Success /> },
     { path: "/payment", element: <Payment /> },
+    { path: "/otp", element: <OtpPage /> },
     { path: "*", element: <>Page not found</> },
   ];
 
