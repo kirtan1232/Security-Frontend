@@ -3,6 +3,8 @@ import { Link, useNavigate, NavLink } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logoImage from "../assets/images/logo.png";
+import { faClipboardList } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const AdminSidebar = () => {
     const navigate = useNavigate();
@@ -297,6 +299,17 @@ const AdminSidebar = () => {
                                     <DashboardIcon />
                                 </div>
                                 {!isCollapsed && <span className="ml-3 font-medium text-sm">User Dashboard</span>}
+                            </Link>
+                        </li>
+                        <li>
+                            <Link
+                                to="/auditlog"
+                                className="group flex items-center p-3 text-gray-200 hover:text-white rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-cyan-500/20 hover:to-blue-600/20 border border-transparent hover:border-cyan-600/30 hover:shadow-lg transform hover:-translate-y-1"
+                            >
+                                <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-r from-cyan-500/30 to-blue-600/30 group-hover:from-cyan-500/50 group-hover:to-blue-600/50 transition-all duration-300 flex-shrink-0">
+                                    <FontAwesomeIcon icon={faClipboardList} />
+                                </div>
+                                {!isCollapsed && <span className="ml-3 font-medium text-sm">Audit Log</span>}
                             </Link>
                         </li>
                     </ul>
