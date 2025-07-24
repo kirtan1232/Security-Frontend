@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Sidebar from "../../components/sidebar.jsx";
 import zxcvbn from "zxcvbn";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 export default function Profile() {
     const { theme } = useTheme();
@@ -20,6 +22,8 @@ export default function Profile() {
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [passwordScore, setPasswordScore] = useState(0);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
 
@@ -268,18 +272,28 @@ export default function Profile() {
                                     </div>
                                     <div>
                                         <label className={`block text-sm ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'} mb-1`}>New Password</label>
-                                        <input
-                                            type="password"
-                                            className={`w-full p-2 rounded-lg ${theme === 'light' ? 'bg-white text-black border-gray-300' : 'bg-gray-600 bg-opacity-50 text-white border-gray-500'} border focus:border-gray-400 focus:outline-none`}
-                                            placeholder="Enter new password"
-                                            value={newPassword}
-                                            onChange={handleNewPasswordChange}
-                                            autoComplete="new-password"
-                                        />
+                                        <div className="relative group">
+                                            <input
+                                                type={showNewPassword ? "text" : "password"}
+                                                className={`w-full p-2 rounded-lg pr-10 ${theme === 'light' ? 'bg-white text-black border-gray-300' : 'bg-gray-600 bg-opacity-50 text-white border-gray-500'} border focus:border-gray-400 focus:outline-none`}
+                                                placeholder="Enter new password"
+                                                value={newPassword}
+                                                onChange={handleNewPasswordChange}
+                                                autoComplete="new-password"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowNewPassword(!showNewPassword)}
+                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 z-10 text-gray-400 hover:text-purple-400 transition-colors duration-300"
+                                                tabIndex={-1}
+                                            >
+                                                <FontAwesomeIcon icon={showNewPassword ? faEyeSlash : faEye} />
+                                            </button>
+                                        </div>
                                         {/* Password Strength Meter */}
                                         {newPassword && (
-                                            <div className="mt-1">
-                                                <div className="w-full bg-gray-400 rounded-full h-2">
+                                            <div className="mt-2">
+                                                <div className="w-full bg-gray-600 rounded-full h-2">
                                                     <div
                                                         className={`h-2 rounded-full transition-all duration-300 ${
                                                             passwordScore === 0 ? "w-0" :
@@ -290,22 +304,32 @@ export default function Profile() {
                                                         }`}
                                                     ></div>
                                                 </div>
-                                                <div className="text-xs text-gray-300 mt-1">
-                                                    {["Very Weak", "Weak", "Fair", "Good", "Strong"][passwordScore]}
-                                                </div>
+                                                <p className="text-sm text-gray-300 mt-1">
+                                                    Password Strength: {passwordScore === 0 ? "None" : passwordScore === 1 ? "Weak" : passwordScore === 2 ? "Fair" : passwordScore === 3 ? "Good" : "Strong"}
+                                                </p>
                                             </div>
                                         )}
                                     </div>
                                     <div>
                                         <label className={`block text-sm ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'} mb-1`}>Confirm New Password</label>
-                                        <input
-                                            type="password"
-                                            className={`w-full p-2 rounded-lg ${theme === 'light' ? 'bg-white text-black border-gray-300' : 'bg-gray-600 bg-opacity-50 text-white border-gray-500'} border focus:border-gray-400 focus:outline-none`}
-                                            placeholder="Confirm new password"
-                                            value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)}
-                                            autoComplete="new-password"
-                                        />
+                                        <div className="relative group">
+                                            <input
+                                                type={showConfirmPassword ? "text" : "password"}
+                                                className={`w-full p-2 rounded-lg pr-10 ${theme === 'light' ? 'bg-white text-black border-gray-300' : 'bg-gray-600 bg-opacity-50 text-white border-gray-500'} border focus:border-gray-400 focus:outline-none`}
+                                                placeholder="Confirm new password"
+                                                value={confirmPassword}
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                                autoComplete="new-password"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 z-10 text-gray-400 hover:text-purple-400 transition-colors duration-300"
+                                                tabIndex={-1}
+                                            >
+                                                <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
+                                            </button>
+                                        </div>
                                     </div>
                                     <div className="flex justify-center">
                                         <button
