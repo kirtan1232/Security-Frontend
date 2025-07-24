@@ -25,7 +25,9 @@ import TunerInst from "./core/public/tunerInst.jsx";
 import Success from "./components/success.jsx";
 import Payment from "./core/public/payment.jsx";
 import OtpPage from "./core/public/otp.jsx";
+import AuditLog from "./core/private/auditlog.jsx";
 import './i18n.js'; // Import i18n for translations
+import path from "path";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -74,6 +76,7 @@ function App() {
     { path: "/success", element: <Success /> },
     { path: "/payment", element: <Payment /> },
     { path: "/otp", element: <OtpPage /> },
+    { path: "/auditlog", element: <AuditLog /> },
     { path: "*", element: <>Page not found</> },
   ];
 
