@@ -10,7 +10,9 @@ import {
     faDownload,
     faRefresh,
     faEye,
-    faCalendarAlt
+    faCalendarAlt,
+    faArrowUp,
+    faArrowDown
 } from "@fortawesome/free-solid-svg-icons";
 import { useTheme } from "../../components/ThemeContext";
 
@@ -83,14 +85,22 @@ const AuditLog = () => {
 
     const getActionBadgeColor = (action) => {
         switch (action.toLowerCase()) {
-            case 'login': return 'bg-green-100 text-green-800 border-green-200';
-            case 'logout': return 'bg-red-100 text-red-800 border-red-200';
-            case 'register': return 'bg-blue-100 text-blue-800 border-blue-200';
-            case 'update_profile': return 'bg-purple-100 text-purple-800 border-purple-200';
-            case 'lesson_completed': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-            case 'session_completed': return 'bg-indigo-100 text-indigo-800 border-indigo-200';
-            case 'login_failed': return 'bg-red-100 text-red-800 border-red-200';
-            default: return 'bg-gray-100 text-gray-800 border-gray-200';
+            case 'login': 
+            case 'login_success': 
+                return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700';
+            case 'logout': return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700';
+            case 'register': return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700';
+            case 'update_profile': return 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-700';
+            case 'lesson_completed': return 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-700';
+            case 'session_completed': return 'bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-700';
+            case 'login_failed': 
+            case 'login_blocked':
+            case 'account_locked':
+                return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700';
+            case 'forgot_password':
+            case 'reset_password':
+                return 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-700';
+            default: return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700/30 dark:text-gray-300 dark:border-gray-600';
         }
     };
 
@@ -110,38 +120,34 @@ const AuditLog = () => {
     const uniqueActions = [...new Set(logs.map(log => log.action))];
 
     return (
-        <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-slate-900 flex flex-col md:flex-row`}>
+        <div className="h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex overflow-hidden">
             <AdminSidebar />
-            <main className="flex-1 p-4 md:p-8 overflow-hidden">
-                <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 h-full flex flex-col">
+            <main className="flex-1 p-6 flex justify-center items-center overflow-hidden">
+                <div className="w-full max-w-7xl h-full bg-white/80 dark:bg-gray-800/90 backdrop-blur-sm border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
                     
-                    {/* Header */}
-                    <header className="flex-shrink-0 p-6 border-b border-gray-200 dark:border-gray-700">
+                    {/* Header - Fixed */}
+                    <div className="bg-gradient-to-r from-cyan-600 to-blue-600 dark:from-cyan-700 dark:to-blue-700 p-6 text-white">
                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                             <div className="flex items-center gap-3">
-                                <div className="p-3 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl">
-                                    <FontAwesomeIcon icon={faUserShield} className="text-xl text-white" />
+                                <div className="p-3 bg-white/20 rounded-xl">
+                                    <FontAwesomeIcon icon={faUserShield} className="text-2xl text-white" />
                                 </div>
                                 <div>
-                                    <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">
-                                        Audit Log
-                                    </h1>
-                                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                                        Monitor and track all system activities
-                                    </p>
+                                    <h1 className="text-3xl font-bold mb-2">Audit Log</h1>
+                                    <p className="text-cyan-100 dark:text-cyan-200">Monitor and track all system activities</p>
                                 </div>
                             </div>
                             
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-3">
                                 <button
                                     onClick={fetchLogs}
-                                    className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                                    className="flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                                     disabled={loading}
                                 >
                                     <FontAwesomeIcon icon={faRefresh} className={`mr-2 ${loading ? 'animate-spin' : ''}`} />
                                     Refresh
                                 </button>
-                                <span className="px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300">
+                                <span className="px-3 py-2 bg-white/20 rounded-xl text-sm font-medium text-white">
                                     {filteredLogs.length} records
                                 </span>
                             </div>
@@ -152,55 +158,55 @@ const AuditLog = () => {
                             {/* Search Filter */}
                             <div className="relative">
                                 <input
-                                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-cyan-400 outline-none transition-all duration-300"
+                                    className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-white/20 bg-white/10 text-white placeholder-white/70 focus:border-white/40 focus:ring-4 focus:ring-white/10 outline-none transition-all duration-300"
                                     value={filter}
                                     onChange={e => setFilter(e.target.value)}
                                     placeholder="Search by user, action, IP..."
                                 />
-                                <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
+                                <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70" />
                             </div>
                             
                             {/* Action Filter */}
                             <div className="relative">
                                 <select
-                                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-cyan-400 outline-none appearance-none transition-all duration-300"
+                                    className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-white/20 bg-white/10 text-white focus:border-white/40 focus:ring-4 focus:ring-white/10 outline-none appearance-none transition-all duration-300"
                                     value={actionFilter}
                                     onChange={e => setActionFilter(e.target.value)}
                                 >
-                                    <option value="">All Actions</option>
+                                    <option value="" className="bg-gray-800 text-white">All Actions</option>
                                     {uniqueActions.map(action => (
-                                        <option key={action} value={action}>{action}</option>
+                                        <option key={action} value={action} className="bg-gray-800 text-white">{action}</option>
                                     ))}
                                 </select>
-                                <FontAwesomeIcon icon={faFilter} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
+                                <FontAwesomeIcon icon={faFilter} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70" />
                             </div>
                             
                             {/* Date Filter */}
                             <div className="relative">
                                 <input
                                     type="date"
-                                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-cyan-400 outline-none transition-all duration-300"
+                                    className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-white/20 bg-white/10 text-white focus:border-white/40 focus:ring-4 focus:ring-white/10 outline-none transition-all duration-300"
                                     value={dateFilter}
                                     onChange={e => setDateFilter(e.target.value)}
                                 />
-                                <FontAwesomeIcon icon={faCalendarAlt} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
+                                <FontAwesomeIcon icon={faCalendarAlt} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70" />
                             </div>
                             
                             {/* Clear Filters */}
                             <button
                                 onClick={clearFilters}
-                                className="px-4 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-xl transition-all duration-300 transform hover:-translate-y-0.5"
+                                className="px-4 py-3 bg-white/20 hover:bg-white/30 text-white rounded-xl transition-all duration-300 transform hover:-translate-y-0.5"
                             >
                                 Clear Filters
                             </button>
                         </div>
-                    </header>
+                    </div>
 
-                    {/* Table Container with Custom Scrollbar */}
-                    <div className="flex-1 overflow-auto custom-scrollbar">
-                        <div className="min-w-full">
-                            <table className="w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                <thead className="bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/30 dark:to-blue-900/30 sticky top-0 z-10">
+                    {/* Scrollable Content - Same pattern as addPracticeSessions */}
+                    <div className="flex-1 overflow-y-auto p-6">
+                        <div className="overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-700 shadow-inner">
+                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead className="bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/30 dark:to-blue-900/30 sticky top-0 z-10 shadow-sm">
                                     <tr>
                                         <th className="px-6 py-4 text-left text-xs font-bold text-cyan-700 dark:text-cyan-200 uppercase tracking-wider">
                                             Time
@@ -258,7 +264,7 @@ const AuditLog = () => {
                                                     </td>
                                                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
                                                         <div className="flex items-center gap-2">
-                                                            <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                                            <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm">
                                                                 {log.user?.email?.charAt(0).toUpperCase() || "?"}
                                                             </div>
                                                             <span className="truncate max-w-xs">
@@ -267,7 +273,7 @@ const AuditLog = () => {
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 text-sm whitespace-nowrap">
-                                                        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getActionBadgeColor(log.action)}`}>
+                                                        <span className={`px-3 py-1 rounded-full text-xs font-medium border shadow-sm ${getActionBadgeColor(log.action)}`}>
                                                             {log.action}
                                                         </span>
                                                     </td>
@@ -281,7 +287,7 @@ const AuditLog = () => {
                                                     </td>
                                                     <td className="px-6 py-4 text-xs text-gray-500 dark:text-gray-400">
                                                         <div className="space-y-1">
-                                                            <div className="font-mono text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                                                            <div className="font-mono text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded shadow-sm">
                                                                 {log.ip || "—"}
                                                             </div>
                                                             <div className="truncate max-w-xs">
@@ -292,7 +298,7 @@ const AuditLog = () => {
                                                     <td className="px-6 py-4 text-sm">
                                                         <button
                                                             onClick={() => setExpandedRow(expandedRow === index ? null : index)}
-                                                            className="text-cyan-600 hover:text-cyan-800 dark:text-cyan-400 dark:hover:text-cyan-200 transition-colors duration-200"
+                                                            className="text-cyan-600 hover:text-cyan-800 dark:text-cyan-400 dark:hover:text-cyan-200 transition-colors duration-200 px-2 py-1 rounded hover:bg-cyan-50 dark:hover:bg-cyan-900/20"
                                                         >
                                                             <FontAwesomeIcon icon={faEye} className="mr-1" />
                                                             {expandedRow === index ? 'Hide' : 'View'}
@@ -303,17 +309,26 @@ const AuditLog = () => {
                                                     <tr>
                                                         <td colSpan="6" className="px-6 py-4 bg-gray-50 dark:bg-gray-800/50">
                                                             <div className="space-y-3">
-                                                                <h4 className="font-semibold text-gray-800 dark:text-gray-200">Detailed Information</h4>
+                                                                <h4 className="font-semibold text-gray-800 dark:text-gray-200 flex items-center">
+                                                                    <i className="fas fa-info-circle mr-2 text-cyan-500"></i>
+                                                                    Detailed Information
+                                                                </h4>
                                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                                     <div>
-                                                                        <h5 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Details</h5>
-                                                                        <pre className="bg-white dark:bg-gray-900 p-3 rounded-lg text-xs overflow-auto max-h-40 custom-scrollbar border">
+                                                                        <h5 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 flex items-center">
+                                                                            <i className="fas fa-code mr-2 text-blue-500"></i>
+                                                                            Details
+                                                                        </h5>
+                                                                        <pre className="bg-white dark:bg-gray-900 p-3 rounded-lg text-xs overflow-auto max-h-40 border shadow-inner resize-none">
                                                                             {JSON.stringify(log.details, null, 2)}
                                                                         </pre>
                                                                     </div>
                                                                     <div>
-                                                                        <h5 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">User Agent</h5>
-                                                                        <p className="bg-white dark:bg-gray-900 p-3 rounded-lg text-xs border break-all">
+                                                                        <h5 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 flex items-center">
+                                                                            <i className="fas fa-desktop mr-2 text-green-500"></i>
+                                                                            User Agent
+                                                                        </h5>
+                                                                        <p className="bg-white dark:bg-gray-900 p-3 rounded-lg text-xs border break-all shadow-inner max-h-40 overflow-auto resize-none">
                                                                             {log.userAgent || "Not available"}
                                                                         </p>
                                                                     </div>
@@ -331,35 +346,6 @@ const AuditLog = () => {
                     </div>
                 </div>
             </main>
-
-            {/* Custom Scrollbar Styles */}
-            <style jsx>{`
-                .custom-scrollbar {
-                    scrollbar-width: thin;
-                    scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
-                }
-                .custom-scrollbar::-webkit-scrollbar {
-                    width: 8px;
-                    height: 8px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-track {
-                    background: transparent;
-                    border-radius: 10px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: linear-gradient(45deg, rgba(6, 182, 212, 0.5), rgba(59, 130, 246, 0.5));
-                    border-radius: 10px;
-                    border: 2px solid transparent;
-                    background-clip: content-box;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background: linear-gradient(45deg, rgba(6, 182, 212, 0.8), rgba(59, 130, 246, 0.8));
-                    background-clip: content-box;
-                }
-                .custom-scrollbar::-webkit-scrollbar-corner {
-                    background: transparent;
-                }
-            `}</style>
         </div>
     );
 };
