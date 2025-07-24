@@ -96,7 +96,7 @@ export default function AddQuiz() {
         });
 
         try {
-            const response = await fetch("httpss://localhost:3000/api/quiz/addquiz", {
+            const response = await fetch("https://localhost:3000/api/quiz/addquiz", {
                 method: "POST",
                 body: formData,
             });
