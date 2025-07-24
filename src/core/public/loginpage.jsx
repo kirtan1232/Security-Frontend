@@ -6,15 +6,18 @@ import axios from "axios";
 import loginSound from "../../assets/audio/intro.m4a";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ReCAPTCHA from "react-google-recaptcha";
 
-// Get API base URL from env
+// Get API base URL and reCAPTCHA site key from .env
 const API_URL = import.meta.env.VITE_API_URL;
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
 const LoginPage = ({ setIsAuthenticated, setIsAdmin }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [captchaToken, setCaptchaToken] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -34,10 +37,18 @@ const LoginPage = ({ setIsAuthenticated, setIsAdmin }) => {
         navigate("/register");
     };
 
+    const handleCaptchaChange = (token) => {
+        setCaptchaToken(token);
+    };
+
     const handleLogin = async (e) => {
         e.preventDefault();
         if (!email || !password) {
             toast.error("Please fill in both fields.");
+            return;
+        }
+        if (!captchaToken) {
+            toast.error("Please verify you are not a robot.");
             return;
         }
         if (loading) return;
@@ -46,7 +57,7 @@ const LoginPage = ({ setIsAuthenticated, setIsAdmin }) => {
             delete axios.defaults.headers.common['Authorization'];
             const response = await axios.post(
                 `${API_URL}/auth/login`,
-                { email, password }
+                { email, password, captchaToken }
             );
             const { token, role } = response.data;
             localStorage.setItem("token", token);
@@ -149,6 +160,14 @@ const LoginPage = ({ setIsAuthenticated, setIsAdmin }) => {
                                 >
                                     <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                                 </button>
+                            </div>
+
+                            {/* reCAPTCHA */}
+                            <div className="flex justify-center mt-4">
+                                <ReCAPTCHA
+                                    sitekey={RECAPTCHA_SITE_KEY}
+                                    onChange={handleCaptchaChange}
+                                />
                             </div>
 
                             {/* Forgot Password */}
