@@ -76,7 +76,6 @@ function App() {
     { path: "/success", element: <Success /> },
     { path: "/payment", element: <Payment /> },
     { path: "/otp", element: <OtpPage /> },
-    { path: "/auditlog", element: <AuditLog /> },
     { path: "*", element: <>Page not found</> },
   ];
 
@@ -165,6 +164,19 @@ function App() {
         </ProtectedRoute>
       ),
     },
+    {
+      path: "/auditlog",
+      element: (
+        <ProtectedRoute
+          isAdminRoute={true}
+          isAuthenticated={isAuthenticated}
+          isAdmin={isAdmin}
+        >
+          <AuditLog />
+        </ProtectedRoute>
+      ),
+    },
+
   ];
 
   const routes = [...publicRoutes, ...privateRoutes];
