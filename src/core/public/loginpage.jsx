@@ -7,6 +7,7 @@ import loginSound from "../../assets/audio/intro.m4a";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ReCAPTCHA from "react-google-recaptcha";
+import Cookies from 'js-cookie';
 
 // Get API base URL and reCAPTCHA site key from .env
 const API_URL = import.meta.env.VITE_API_URL;
@@ -21,6 +22,20 @@ const LoginPage = ({ setIsAuthenticated, setIsAdmin }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        // First check for auth cookie
+        const authCookie = Cookies.get('authToken');
+        const roleCookie = Cookies.get('userRole');
+        
+        if (authCookie && roleCookie) {
+            // Use cookie-based authentication
+            axios.defaults.headers.common['Authorization'] = `Bearer ${authCookie}`;
+            setIsAuthenticated(true);
+            setIsAdmin(roleCookie === "admin");
+            navigate("/dashboard");
+            return;
+        }
+        
+        // Fallback to localStorage if no cookies found
         const token = localStorage.getItem("token");
         if (token) {
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -57,18 +72,29 @@ const LoginPage = ({ setIsAuthenticated, setIsAdmin }) => {
             delete axios.defaults.headers.common['Authorization'];
             const response = await axios.post(
                 `${API_URL}/auth/login`,
-                { email, password, captchaToken }
+                { email, password, captchaToken },
+                { withCredentials: true } // Important for receiving cookies from the server
             );
+            
             const { token, role } = response.data;
+            
+            // Still store in localStorage for backward compatibility
             localStorage.setItem("token", token);
             localStorage.setItem("role", role);
+            
+            // Also store in cookies (these are set by the server, but we can also set them here as backup)
+            Cookies.set('authToken', token, { secure: true, sameSite: 'strict', expires: 1/24 }); // 1 hour
+            Cookies.set('userRole', role, { secure: true, sameSite: 'strict', expires: 1/24 }); // 1 hour
+            
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             setIsAuthenticated(true);
             setIsAdmin(role === "admin");
+            
             const audio = new Audio(loginSound);
             audio.play().catch((error) => {
                 console.error("Error playing login sound:", error);
             });
+            
             toast.success("Login successful!", { autoClose: 1500 });
             navigate("/dashboard");
         } catch (error) {
