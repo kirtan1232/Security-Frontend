@@ -5,13 +5,11 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Footer from "../../components/footer.jsx";
 import Sidebar from "../../components/sidebar.jsx";
-import { useTheme } from "../../components/ThemeContext";
 
 const SupportPayment = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [userProfile, setUserProfile] = useState(null);
-  const { theme } = useTheme();
   const [nameOrSocial, setNameOrSocial] = useState("");
   const [message, setMessage] = useState("");
   const [amount, setAmount] = useState(10); // Changed default amount to 10
@@ -130,51 +128,58 @@ const SupportPayment = () => {
   };
 
   return (
-    <div className={`flex flex-col min-h-screen ${theme === "light" ? "bg-gradient-to-br from-purple-100 via-blue-100 to-pink-100" : "bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800"}`}>
-      <div className="flex flex-1">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900">
+      {/* Animated background elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-10 left-10 w-64 h-64 bg-purple-800 rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute bottom-10 right-10 w-48 h-48 bg-blue-800 rounded-full opacity-20 animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-pink-800 rounded-full opacity-20 animate-pulse delay-2000"></div>
+      </div>
+      
+      <div className="relative flex flex-1 z-10">
         <Sidebar />
         <main className="flex-1 p-6 flex justify-center items-center mt-6">
-          <div className="bg-white bg-opacity-60 backdrop-blur-lg dark:bg-gray-800 dark:bg-opacity-80 rounded-3xl shadow-2xl p-8 w-full max-w-6xl border border-white/20 dark:border-gray-700/30">
+          <div className="bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 w-full max-w-6xl border border-gray-700/50">
             {/* Header with enhanced styling */}
             <header className="mb-8 flex items-center space-x-4 animate-fade-in">
               {userProfile && userProfile.profilePicture ? (
                 <img
                   src={`https://localhost:3000/${userProfile.profilePicture}`}
                   alt="Profile"
-                  className="w-16 h-16 rounded-full border-2 border-gradient-to-r from-purple-400 to-blue-400 dark:border-gray-600 cursor-pointer shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  className="w-16 h-16 rounded-full border-2 border-gradient-to-r from-purple-400 to-blue-400 border-gray-600 cursor-pointer shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                   onClick={() => navigate("/profile")}
                 />
               ) : (
                 <img
                   src="src/assets/images/profile.png"
                   alt="Profile"
-                  className="w-16 h-16 rounded-full border-2 border-gradient-to-r from-purple-400 to-blue-400 dark:border-gray-600 cursor-pointer shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  className="w-16 h-16 rounded-full border-2 border-gradient-to-r from-purple-400 to-blue-400 border-gray-600 cursor-pointer shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                   onClick={() => navigate("/profile")}
                 />
               )}
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent dark:from-purple-400 dark:to-blue-400">
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
                   Hello, {userProfile ? userProfile.name : "User"}
                 </h1>
-                <p className="text-gray-600 dark:text-gray-300 mt-1">Support Soundwise's musical journey</p>
+                <p className="text-gray-300 mt-1">Support Soundwise's musical journey</p>
               </div>
             </header>
 
             <div className="mt-8 flex justify-center">
-              <div className="w-full max-w-5xl bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl dark:bg-gray-800/90 overflow-hidden border border-white/20 dark:border-gray-700/30">
+              <div className="w-full max-w-5xl bg-gray-700/90 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-600/30 overflow-hidden">
                 <div className="flex flex-col lg:flex-row">
                   {/* Left Section - About with enhanced styling */}
-                  <div className="lg:w-1/2 p-8 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-800 dark:to-purple-900/30">
+                  <div className="lg:w-1/2 p-8 bg-gradient-to-br from-gray-700 to-gray-800/30">
                     <div className="flex items-center mb-6">
-                      <FaMusic className="text-purple-500 text-2xl mr-3" />
-                      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+                      <FaMusic className="text-purple-400 text-2xl mr-3" />
+                      <h2 className="text-2xl font-bold text-gray-200">
                         About Soundwise
                       </h2>
                     </div>
                     
-                    <div className="space-y-4 text-gray-700 dark:text-gray-300">
+                    <div className="space-y-4 text-gray-300">
                       <div className="flex items-start space-x-3">
-                        <FaGuitar className="text-purple-500 mt-1 flex-shrink-0" />
+                        <FaGuitar className="text-purple-400 mt-1 flex-shrink-0" />
                         <p>
                           I'm dedicated to making music more accessible for musicians
                           by uncovering the perfect chord progressions for your
@@ -185,7 +190,7 @@ const SupportPayment = () => {
                       </div>
                       
                       <div className="flex items-start space-x-3">
-                        <FaHeart className="text-red-500 mt-1 flex-shrink-0" />
+                        <FaHeart className="text-red-400 mt-1 flex-shrink-0" />
                         <p>
                           I also offer a special song request feature, where you can
                           ask for your favorite song's chords, and I'll do my best to
@@ -195,7 +200,7 @@ const SupportPayment = () => {
                         </p>
                       </div>
                       
-                      <div className="bg-white/50 dark:bg-gray-700/50 rounded-lg p-4 border-l-4 border-purple-500">
+                      <div className="bg-gray-600/50 rounded-lg p-4 border-l-4 border-purple-500">
                         <p className="italic">
                           "Thank you for being part of this musical journey! Together,
                           we'll make every song a little easier to play, one chord at
@@ -221,10 +226,10 @@ const SupportPayment = () => {
                   </div>
 
                   {/* Right Section - Payment Form with enhanced styling */}
-                  <div className="lg:w-1/2 p-8 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-700 dark:to-purple-900/30">
+                  <div className="lg:w-1/2 p-8 bg-gradient-to-br from-gray-600/30 to-purple-900/30">
                     <div className="flex items-center justify-center mb-6">
-                      <FaCoffee className="text-4xl text-amber-600 mr-3 animate-pulse" />
-                      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+                      <FaCoffee className="text-4xl text-amber-400 mr-3 animate-pulse" />
+                      <h2 className="text-2xl font-bold text-gray-200">
                         Buy Soundwise a Coffee
                       </h2>
                     </div>
@@ -232,8 +237,8 @@ const SupportPayment = () => {
                     {/* Amount Selection with enhanced styling */}
                     <div className="mb-6">
                       <div className="flex items-center justify-center mb-4">
-                        <FaCoffee className="text-2xl text-amber-600 mr-2" />
-                        <span className="text-gray-600 dark:text-gray-400 text-lg">×</span>
+                        <FaCoffee className="text-2xl text-amber-400 mr-2" />
+                        <span className="text-gray-300 text-lg">×</span>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         {[10, 20, 30, 50].map((value) => (
@@ -244,7 +249,7 @@ const SupportPayment = () => {
                             className={`px-4 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${
                               amount === value
                                 ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg"
-                                : "bg-white/70 dark:bg-gray-600/70 text-gray-700 dark:text-gray-200 hover:bg-white dark:hover:bg-gray-600 shadow-md"
+                                : "bg-gray-600/70 text-gray-200 hover:bg-gray-600 shadow-md"
                             }`}
                           >
                             Rs. {value}
@@ -260,7 +265,7 @@ const SupportPayment = () => {
                           value={nameOrSocial}
                           onChange={(e) => setNameOrSocial(e.target.value)}
                           placeholder="Name or @yoursocial"
-                          className="w-full p-4 border border-gray-200 dark:border-gray-600 rounded-xl bg-white/80 dark:bg-gray-600/80 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 backdrop-blur-sm"
+                          className="w-full p-4 border border-gray-600 rounded-xl bg-gray-600/80 text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 backdrop-blur-sm"
                           required
                         />
                       </div>
@@ -270,7 +275,7 @@ const SupportPayment = () => {
                           onChange={(e) => setMessage(e.target.value)}
                           placeholder="Say something nice... 💝"
                           rows="3"
-                          className="w-full p-4 border border-gray-200 dark:border-gray-600 rounded-xl bg-white/80 dark:bg-gray-600/80 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 backdrop-blur-sm resize-none"
+                          className="w-full p-4 border border-gray-600 rounded-xl bg-gray-600/80 text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 backdrop-blur-sm resize-none"
                         />
                       </div>
                       <button
@@ -283,7 +288,7 @@ const SupportPayment = () => {
                       </button>
                     </form>
                     
-                    <div className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                    <div className="mt-4 text-center text-sm text-gray-400">
                       <p>🔒 Secure payment via eSewa</p>
                     </div>
                   </div>

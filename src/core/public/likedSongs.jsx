@@ -5,11 +5,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart, faPlay } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useTheme } from "../../components/ThemeContext";
 import Footer from "../../components/footer.jsx";
 
 export default function LikedSongs() {
-    const { theme } = useTheme();
     const [likedSongs, setLikedSongs] = useState([]);
     const [userProfile, setUserProfile] = useState(null);
     const navigate = useNavigate();
@@ -99,25 +97,32 @@ export default function LikedSongs() {
     };
 
     return (
-        <div className={`min-h-screen flex flex-col ${theme === 'light' ? 'bg-gradient-to-br from-purple-100 via-blue-100 to-pink-100' : 'bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800'}`}>
-            <div className="relative flex flex-1">
+        <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900">
+            {/* Animated background elements */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-10 left-10 w-64 h-64 bg-purple-800 rounded-full opacity-20 animate-pulse"></div>
+                <div className="absolute bottom-10 right-10 w-48 h-48 bg-blue-800 rounded-full opacity-20 animate-pulse delay-1000"></div>
+                <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-pink-800 rounded-full opacity-20 animate-pulse delay-2000"></div>
+            </div>
+            
+            <div className="relative flex flex-1 z-10">
                 <Sidebar />
                 <main className="flex-1 p-6 flex justify-center items-start mt-4">
-                    <div className="bg-white bg-opacity-60 backdrop-blur-lg dark:bg-gray-800 dark:bg-opacity-80 rounded-3xl shadow-lg p-8 w-full max-w-7xl h-[85vh] overflow-y-auto">
-                        <h2 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-200 tracking-wide">
+                    <div className="bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-700/50 p-8 w-full max-w-7xl h-[85vh] overflow-y-auto">
+                        <h2 className="text-3xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent tracking-wide">
                             Your Liked Songs
                         </h2>
                         {likedSongs.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-full">
                                 <FontAwesomeIcon
                                     icon={faHeart}
-                                    className="text-gray-400 dark:text-gray-500 text-4xl mb-4"
+                                    className="text-gray-500 text-4xl mb-4"
                                 />
-                                <p className="text-center text-gray-500 dark:text-gray-400 text-lg">
+                                <p className="text-center text-gray-400 text-lg">
                                     No liked songs yet. Start exploring to add some!
                                 </p>
                                 <button
-                                    className="mt-4 py-2 px-6 bg-gradient-to-r from-[#99CCFF] via-[#C6B7FE] to-[#766E98] text-white rounded-full hover:shadow-md transition-all duration-200"
+                                    className="mt-4 py-2 px-6 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-full hover:shadow-md transition-all duration-200"
                                     onClick={() => navigate("/chords")}
                                 >
                                     Explore Songs
@@ -128,7 +133,7 @@ export default function LikedSongs() {
                                 {likedSongs.map((song) => (
                                     <div
                                         key={song._id}
-                                        className="relative bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden cursor-pointer 
+                                        className="relative bg-gray-700 rounded-xl shadow-md overflow-hidden cursor-pointer 
                                         hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:scale-105"
                                         onClick={() => navigate(`/song/${song._id}`)}
                                     >
@@ -140,16 +145,16 @@ export default function LikedSongs() {
                                             />
                                         </div>
                                         <div className="p-4">
-                                            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 truncate">
+                                            <h3 className="text-lg font-semibold text-gray-200 truncate">
                                                 {song.songName}
                                             </h3>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                                            <p className="text-sm text-gray-400 truncate">
                                                 {song.artist || "Unknown Artist"}
                                             </p>
                                         </div>
                                         <div className="absolute top-2 right-2 flex space-x-2">
                                             <button
-                                                className="p-2 bg-white dark:bg-gray-800 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-600 
+                                                className="p-2 bg-gray-800 rounded-full shadow-md hover:bg-gray-600 
                                                 transition-transform duration-200 hover:scale-110"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
@@ -158,11 +163,11 @@ export default function LikedSongs() {
                                             >
                                                 <FontAwesomeIcon
                                                     icon={faPlay}
-                                                    className="text-blue-500 dark:text-blue-400 text-sm"
+                                                    className="text-blue-400 text-sm"
                                                 />
                                             </button>
                                             <button
-                                                className="p-2 bg-white dark:bg-gray-800 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-600 
+                                                className="p-2 bg-gray-800 rounded-full shadow-md hover:bg-gray-600 
                                                 transition-transform duration-200 hover:scale-110"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
@@ -171,7 +176,7 @@ export default function LikedSongs() {
                                             >
                                                 <FontAwesomeIcon
                                                     icon={faHeart}
-                                                    className="text-red-500 dark:text-red-400 text-sm"
+                                                    className="text-red-400 text-sm"
                                                 />
                                             </button>
                                         </div>
@@ -182,21 +187,26 @@ export default function LikedSongs() {
                     </div>
                 </main>
                 <div className="absolute top-4 right-4">
-                    {userProfile && userProfile.profilePicture ? (
-                        <img
-                            src={`https://localhost:3000/${userProfile.profilePicture}`}
-                            alt="Profile"
-                            className="w-16 h-16 rounded-full border border-gray-300 dark:border-gray-600 cursor-pointer transition-transform duration-200 hover:scale-110"
-                            onClick={() => navigate("/profile")}
-                        />
-                    ) : (
-                        <img
-                            src="/profile.png"
-                            alt="Profile"
-                            className="w-16 h-16 rounded-full border border-gray-300 dark:border-gray-600 cursor-pointer transition-transform duration-200 hover:scale-110"
-                            onClick={() => navigate("/profile")}
-                        />
-                    )}
+                    <div className="relative group">
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-300"></div>
+                        <div className="relative bg-gray-800/80 backdrop-blur-lg rounded-full p-1">
+                            {userProfile && userProfile.profilePicture ? (
+                                <img
+                                    src={`https://localhost:3000/${userProfile.profilePicture}`}
+                                    alt="Profile"
+                                    className="w-16 h-16 rounded-full border-2 border-gray-600 cursor-pointer hover:scale-110 transition-transform duration-300"
+                                    onClick={() => navigate("/profile")}
+                                />
+                            ) : (
+                                <img
+                                    src="/profile.png"
+                                    alt="Profile"
+                                    className="w-16 h-16 rounded-full border-2 border-gray-600 cursor-pointer hover:scale-110 transition-transform duration-300"
+                                    onClick={() => navigate("/profile")}
+                                />
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
             <Footer />

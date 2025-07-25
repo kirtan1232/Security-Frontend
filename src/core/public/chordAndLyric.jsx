@@ -3,11 +3,9 @@ import Sidebar from "../../components/sidebar.jsx";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { FaHeart, FaRegHeart, FaMusic, FaGuitar, FaPlay, FaSearch, FaFire, FaStar } from "react-icons/fa";
-import { useTheme } from "../../components/ThemeContext";
 import Footer from "../../components/footer.jsx";
 
 export default function ChordAndLyric() {
-    const { theme } = useTheme();
     const [songs, setSongs] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("Guitar");
     const [userProfile, setUserProfile] = useState(null);
@@ -193,11 +191,18 @@ export default function ChordAndLyric() {
     const totalSongsCount = songs.length;
 
     return (
-        <div className={`bg-gradient-to-br min-h-screen flex flex-col ${theme === 'light' ? 'from-purple-100 via-blue-100 to-pink-100' : 'from-gray-900 via-purple-900 to-gray-800'}`}>
-            <div className="relative flex flex-1">
+        <div className="bg-gradient-to-br min-h-screen flex flex-col from-gray-900 via-indigo-900 to-purple-900">
+            {/* Animated background elements */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-10 left-10 w-64 h-64 bg-purple-800 rounded-full opacity-20 animate-pulse"></div>
+                <div className="absolute bottom-10 right-10 w-48 h-48 bg-blue-800 rounded-full opacity-20 animate-pulse delay-1000"></div>
+                <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-pink-800 rounded-full opacity-20 animate-pulse delay-2000"></div>
+            </div>
+
+            <div className="relative flex flex-1 z-10">
                 <Sidebar />
                 <main className="flex-1 p-6 flex justify-center items-start mt-4">
-                    <div className="bg-white/70 backdrop-blur-xl dark:bg-gray-800/80 rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700/30 p-8 w-full max-w-7xl h-[85vh] overflow-y-auto">
+                    <div className="bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-700/50 p-8 w-full max-w-7xl h-[85vh] overflow-y-auto">
                         
                         {/* Stats Section - Only Available Songs and Search Results */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
@@ -220,20 +225,20 @@ export default function ChordAndLyric() {
                         {/* Search Bar */}
                         <div className="relative mb-8">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-                                <FaSearch className={`text-lg ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`} />
+                                <FaSearch className="text-lg text-gray-300" />
                             </div>
                             <input
                                 type="text"
                                 placeholder="Search for songs..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-12 pr-4 py-4 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm rounded-2xl border border-white/30 dark:border-gray-600/30 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 text-lg transition-all duration-300 hover:shadow-lg"
+                                className="w-full pl-12 pr-4 py-4 bg-gray-700/80 backdrop-blur-sm rounded-2xl border border-gray-600/30 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-200 placeholder-gray-400 text-lg transition-all duration-300 hover:shadow-lg"
                             />
                         </div>
 
                         {/* Instrument Selection */}
                         <div className="flex justify-center mb-8">
-                            <div className="flex bg-white/50 dark:bg-gray-700/50 rounded-2xl p-2 shadow-lg backdrop-blur-sm">
+                            <div className="flex bg-gray-700/50 rounded-2xl p-2 shadow-lg backdrop-blur-sm">
                                 {["Guitar", "Piano", "Ukulele"].map((category) => (
                                     <button
                                         key={category}
@@ -241,7 +246,7 @@ export default function ChordAndLyric() {
                                         className={`flex items-center px-6 py-3 rounded-xl transition-all duration-300 transform hover:scale-105 ${
                                             selectedCategory === category
                                                 ? `bg-gradient-to-r ${getInstrumentGradient(category)} text-white shadow-lg`
-                                                : "text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-600/50"
+                                                : "text-gray-300 hover:bg-gray-600/50"
                                         }`}
                                     >
                                         <span className="mr-2">
@@ -257,14 +262,14 @@ export default function ChordAndLyric() {
                         <div className="space-y-4">
                             {filteredSongs.length === 0 ? (
                                 <div className="text-center py-16">
-                                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-200 dark:bg-gray-700 mb-4">
+                                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-700 mb-4">
                                         <FaMusic className="text-gray-400 text-2xl" />
                                     </div>
-                                    <p className="text-xl text-gray-500 dark:text-gray-400 mb-2">
+                                    <p className="text-xl text-gray-400 mb-2">
                                         {searchTerm ? "No songs found matching your search" : "No songs available in this category"}
                                     </p>
                                     {searchTerm && (
-                                        <p className="text-gray-400 dark:text-gray-500">
+                                        <p className="text-gray-500">
                                             Try searching for something else
                                         </p>
                                     )}
@@ -282,7 +287,7 @@ export default function ChordAndLyric() {
                                                 animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`
                                             }}
                                         >
-                                            <div className="relative bg-gradient-to-br from-white/80 to-white/60 dark:from-gray-700/80 dark:to-gray-800/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-white/30 dark:border-gray-600/30 overflow-hidden">
+                                            <div className="relative bg-gradient-to-br from-gray-700/80 to-gray-800/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-gray-600/30 overflow-hidden">
                                                 
                                                 {/* Song Image */}
                                                 <div className="relative h-48 overflow-hidden">
@@ -331,10 +336,10 @@ export default function ChordAndLyric() {
 
                                                 {/* Song Info */}
                                                 <div className="p-4">
-                                                    <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors mb-2 line-clamp-2">
+                                                    <h3 className="text-lg font-bold text-gray-200 group-hover:text-purple-400 transition-colors mb-2 line-clamp-2">
                                                         {song.songName}
                                                     </h3>
-                                                    <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
+                                                    <div className="flex items-center text-gray-400 text-sm">
                                                         <FaPlay className="mr-2" />
                                                         <span>Click to view chords</span>
                                                     </div>
@@ -357,19 +362,19 @@ export default function ChordAndLyric() {
                 <div className="absolute top-4 right-4">
                     <div className="relative group">
                         <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-300"></div>
-                        <div className="relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-full p-1">
+                        <div className="relative bg-gray-800/80 backdrop-blur-lg rounded-full p-1">
                             {userProfile && userProfile.profilePicture ? (
                                 <img
                                     src={`https://localhost:3000/${userProfile.profilePicture}`}
                                     alt="Profile"
-                                    className="w-16 h-16 rounded-full border-2 border-white dark:border-gray-600 cursor-pointer hover:scale-110 transition-transform duration-300"
+                                    className="w-16 h-16 rounded-full border-2 border-gray-600 cursor-pointer hover:scale-110 transition-transform duration-300"
                                     onClick={() => navigate("/profile")}
                                 />
                             ) : (
                                 <img
                                     src="/profile.png"
                                     alt="Profile"
-                                    className="w-16 h-16 rounded-full border-2 border-white dark:border-gray-600 cursor-pointer hover:scale-110 transition-transform duration-300"
+                                    className="w-16 h-16 rounded-full border-2 border-gray-600 cursor-pointer hover:scale-110 transition-transform duration-300"
                                     onClick={() => navigate("/profile")}
                                 />
                             )}

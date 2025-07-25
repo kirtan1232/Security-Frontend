@@ -2,13 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Sidebar from "../../components/sidebar.jsx";
 import { FaCheckCircle, FaPlay, FaClock, FaBook } from "react-icons/fa";
-import { useTheme } from "../../components/ThemeContext";
 import Footer from "../../components/footer.jsx";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function SessionDetails() {
-  const { theme } = useTheme();
   const { day, instrument } = useParams();
   const [sessions, setSessions] = useState([]);
   const [completed, setCompleted] = useState(false);
@@ -161,20 +159,27 @@ export default function SessionDetails() {
   };
 
   return (
-    <div className={`bg-gradient-to-br min-h-screen flex flex-col ${theme === 'light' ? 'from-purple-100 via-blue-100 to-pink-100' : 'from-gray-900 via-purple-900 to-gray-800'} fallback:bg-gray-900`}>
-      <div className="relative flex flex-1">
+    <div className="bg-gradient-to-br min-h-screen flex flex-col from-gray-900 via-indigo-900 to-purple-900 fallback:bg-gray-900">
+      {/* Animated background elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-10 left-10 w-64 h-64 bg-purple-800 rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute bottom-10 right-10 w-48 h-48 bg-blue-800 rounded-full opacity-20 animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-pink-800 rounded-full opacity-20 animate-pulse delay-2000"></div>
+      </div>
+
+      <div className="relative flex flex-1 z-10">
         <Sidebar />
         <main className="flex-1 p-6 flex justify-center items-start mt-4">
-          <div className="bg-white/70 backdrop-blur-xl dark:bg-gray-800/80 rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700/30 p-8 w-full max-w-7xl h-[85vh] overflow-y-auto">
+          <div className="bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-700/50 p-8 w-full max-w-7xl h-[85vh] overflow-y-auto">
             {/* Header with enhanced styling */}
             <header className="mb-8 text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 mb-4">
                 <FaPlay className="text-white text-xl" />
               </div>
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
+              <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
                 Practice Session
               </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-300">
+              <p className="text-lg text-gray-300">
                 {day} • {instrument}
               </p>
             </header>
@@ -182,16 +187,16 @@ export default function SessionDetails() {
             <div className="space-y-6">
               {sessions.length === 0 ? (
                 <div className="text-center py-16">
-                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-200 dark:bg-gray-700 mb-4">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-700 mb-4">
                     <FaBook className="text-gray-400 text-2xl" />
                   </div>
-                  <p className="text-xl text-gray-500 dark:text-gray-400">No sessions available.</p>
+                  <p className="text-xl text-gray-400">No sessions available.</p>
                 </div>
               ) : (
                 sessions.map((session, index) => (
                   <div
                     key={session._id}
-                    className="group relative p-6 bg-gradient-to-br from-white/80 to-white/60 dark:from-gray-700/80 dark:to-gray-800/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] border border-white/30 dark:border-gray-600/30"
+                    className="group relative p-6 bg-gradient-to-br from-gray-700/80 to-gray-800/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] border border-gray-600/30"
                     style={{
                       animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`
                     }}
@@ -199,10 +204,10 @@ export default function SessionDetails() {
                     {/* Session Header */}
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
-                        <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                        <h3 className="text-2xl font-bold text-gray-200 mb-2 group-hover:text-purple-400 transition-colors">
                           {session.title}
                         </h3>
-                        <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                        <p className="text-gray-400 leading-relaxed">
                           {session.description}
                         </p>
                       </div>
@@ -215,12 +220,12 @@ export default function SessionDetails() {
                     </div>
 
                     {/* Instructions */}
-                    <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-600/30 dark:to-purple-900/20 rounded-xl border-l-4 border-purple-500">
+                    <div className="mb-6 p-4 bg-gradient-to-r from-gray-600/30 to-purple-900/20 rounded-xl border-l-4 border-purple-500">
                       <div className="flex items-center mb-2">
-                        <FaBook className="text-purple-500 mr-2" />
-                        <span className="font-semibold text-gray-700 dark:text-gray-300">Instructions:</span>
+                        <FaBook className="text-purple-400 mr-2" />
+                        <span className="font-semibold text-gray-300">Instructions:</span>
                       </div>
-                      <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                      <p className="text-gray-400 leading-relaxed">
                         {session.instructions}
                       </p>
                     </div>
@@ -246,7 +251,7 @@ export default function SessionDetails() {
                     {/* Completion Status */}
                     <div className="flex items-center justify-between">
                       {completed ? (
-                        <div className={`flex items-center text-green-600 dark:text-green-400 ${showCompleteAnimation ? 'animate-bounce' : ''}`}>
+                        <div className={`flex items-center text-green-400 ${showCompleteAnimation ? 'animate-bounce' : ''}`}>
                           <div className="relative">
                             <FaCheckCircle className="text-2xl mr-3" />
                             {showCompleteAnimation && (
@@ -261,7 +266,7 @@ export default function SessionDetails() {
                         <div className="flex items-center justify-between w-full">
                           {/* Timer Display */}
                           <div className="flex items-center">
-                            <div className={`flex items-center px-4 py-2 rounded-full ${timeLeft > 0 ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600' : 'bg-green-100 dark:bg-green-900/30 text-green-600'}`}>
+                            <div className={`flex items-center px-4 py-2 rounded-full ${timeLeft > 0 ? 'bg-orange-900/30 text-orange-400' : 'bg-green-900/30 text-green-400'}`}>
                               <FaClock className="mr-2" />
                               <span className="font-mono text-lg font-bold">
                                 {timeLeft > 0 ? formatTime(timeLeft) : "Ready!"}
@@ -276,7 +281,7 @@ export default function SessionDetails() {
                             className={`relative overflow-hidden px-8 py-3 rounded-full font-bold text-white transition-all duration-500 transform hover:scale-105 ${
                               canMarkComplete
                                 ? "bg-gradient-to-r from-green-500 via-blue-500 to-purple-600 hover:from-green-400 hover:via-blue-400 hover:to-purple-500 shadow-lg hover:shadow-xl"
-                                : "bg-gradient-to-r from-gray-400 to-gray-500 cursor-not-allowed"
+                                : "bg-gradient-to-r from-gray-600 to-gray-700 cursor-not-allowed"
                             }`}
                           >
                             <span className="relative z-10">
@@ -300,19 +305,19 @@ export default function SessionDetails() {
         <div className="absolute top-4 right-4">
           <div className="relative group">
             <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-300"></div>
-            <div className="relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-full p-1">
+            <div className="relative bg-gray-800/80 backdrop-blur-lg rounded-full p-1">
               {userProfile && userProfile.profilePicture ? (
                 <img
                   src={`https://localhost:3000/${userProfile.profilePicture}`}
                   alt="Profile"
-                  className="w-16 h-16 rounded-full border-2 border-white dark:border-gray-600 cursor-pointer hover:scale-110 transition-transform duration-300"
+                  className="w-16 h-16 rounded-full border-2 border-gray-600 cursor-pointer hover:scale-110 transition-transform duration-300"
                   onClick={() => navigate("/profile")}
                 />
               ) : (
                 <img
                   src="/profile.png"
                   alt="Profile"
-                  className="w-16 h-16 rounded-full border-2 border-white dark:border-gray-600 cursor-pointer hover:scale-110 transition-transform duration-300"
+                  className="w-16 h-16 rounded-full border-2 border-gray-600 cursor-pointer hover:scale-110 transition-transform duration-300"
                   onClick={() => navigate("/profile")}
                 />
               )}

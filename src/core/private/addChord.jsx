@@ -3,10 +3,8 @@ import * as mammoth from "mammoth";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import AdminSidebar from "../../components/adminSidebar.jsx";
 import axios from 'axios';
-import { useTheme } from "../../components/ThemeContext";
 
 const AddChord = () => {
-    const { theme } = useTheme();
     const [songName, setSongName] = useState("");
     const [selectedInstrument, setSelectedInstrument] = useState("ukulele");
     const [lyrics, setLyrics] = useState([
@@ -179,14 +177,21 @@ const AddChord = () => {
     };
 
     return (
-        <div className="h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex">
+        <div className="h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 flex">
+            {/* Animated background elements */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-10 left-10 w-64 h-64 bg-purple-800 rounded-full opacity-20 animate-pulse"></div>
+                <div className="absolute bottom-10 right-10 w-48 h-48 bg-blue-800 rounded-full opacity-20 animate-pulse delay-1000"></div>
+                <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-pink-800 rounded-full opacity-20 animate-pulse delay-2000"></div>
+            </div>
+            
             <AdminSidebar />
-            <div className="flex-1 flex justify-center items-center p-4">
-                <div className="bg-white/80 dark:bg-gray-800/90 backdrop-blur-sm border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">
+            <div className="flex-1 flex justify-center items-center p-4 relative z-10">
+                <div className="bg-gray-800/80 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-700 dark:to-blue-700 p-6 text-white">
+                    <div className="bg-gradient-to-r from-purple-700 to-blue-700 p-6 text-white">
                         <h2 className="text-3xl font-bold mb-2">Add New Chord</h2>
-                        <p className="text-purple-100 dark:text-purple-200">Create beautiful chord charts for your favorite songs</p>
+                        <p className="text-purple-200">Create beautiful chord charts for your favorite songs</p>
                     </div>
 
                     {/* Main Content with Scroll */}
@@ -194,7 +199,7 @@ const AddChord = () => {
                         <form onSubmit={handleSubmit} className="space-y-8">
                             {/* Song Title */}
                             <div className="group">
-                                <label className="flex items-center text-gray-700 dark:text-gray-300 font-semibold mb-3">
+                                <label className="flex items-center text-gray-300 font-semibold mb-3">
                                     <i className="fas fa-file-audio mr-2 text-purple-500"></i>
                                     Song Title
                                 </label>
@@ -202,14 +207,14 @@ const AddChord = () => {
                                     type="text"
                                     value={songName}
                                     onChange={(e) => setSongName(e.target.value)}
-                                    className="w-full p-4 border-2 border-gray-200 dark:border-gray-600 rounded-xl shadow-sm dark:bg-gray-700 dark:text-gray-300 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-4 focus:ring-purple-500/10 transition-all duration-200 bg-white/50 dark:bg-gray-700/50"
+                                    className="w-full p-4 border-2 border-gray-600 rounded-xl shadow-sm bg-gray-700/50 text-gray-300 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all duration-200"
                                     placeholder="Enter the song title..."
                                 />
                             </div>
 
                             {/* Instrument Selection */}
                             <div className="group">
-                                <label className="flex items-center text-gray-700 dark:text-gray-300 font-semibold mb-3">
+                                <label className="flex items-center text-gray-300 font-semibold mb-3">
                                     <i className="fas fa-guitar mr-2 text-purple-500"></i>
                                     Select Instrument
                                 </label>
@@ -217,7 +222,7 @@ const AddChord = () => {
                                     <select
                                         value={selectedInstrument}
                                         onChange={handleInstrumentChange}
-                                        className="w-full p-4 border-2 border-gray-200 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-gray-300 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-4 focus:ring-purple-500/10 transition-all duration-200 bg-white/50 dark:bg-gray-700/50 appearance-none cursor-pointer"
+                                        className="w-full p-4 border-2 border-gray-600 rounded-xl bg-gray-700/50 text-gray-300 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all duration-200 appearance-none cursor-pointer"
                                     >
                                         <option value="ukulele">🎸 Ukulele</option>
                                         <option value="guitar">🎸 Guitar</option>
@@ -229,15 +234,15 @@ const AddChord = () => {
 
                             {/* Chord Diagrams Upload */}
                             <div className="group">
-                                <label className="flex items-center text-gray-700 dark:text-gray-300 font-semibold mb-3">
+                                <label className="flex items-center text-gray-300 font-semibold mb-3">
                                     <i className="fas fa-images mr-2 text-purple-500"></i>
                                     Chord Diagrams
                                 </label>
                                 <div 
                                     className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 ${
                                         dragOver 
-                                            ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20' 
-                                            : 'border-gray-300 dark:border-gray-600 hover:border-purple-400 dark:hover:border-purple-500'
+                                            ? 'border-purple-500 bg-purple-900/20' 
+                                            : 'border-gray-600 hover:border-purple-500'
                                     }`}
                                     onDragOver={handleDragOver}
                                     onDragLeave={handleDragLeave}
@@ -252,10 +257,10 @@ const AddChord = () => {
                                     />
                                     <div className="flex flex-col items-center">
                                         <i className="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
-                                        <p className="text-gray-600 dark:text-gray-400 mb-2">
+                                        <p className="text-gray-400 mb-2">
                                             Drop images here or click to browse
                                         </p>
-                                        <p className="text-sm text-gray-500 dark:text-gray-500">
+                                        <p className="text-sm text-gray-500">
                                             PNG, JPG, JPEG up to 10MB each
                                         </p>
                                     </div>
@@ -264,10 +269,10 @@ const AddChord = () => {
                                 {chordDiagrams.length > 0 && (
                                     <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                         {chordDiagrams.map((file, idx) => (
-                                            <div key={idx} className="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                                            <div key={idx} className="flex items-center justify-between p-3 bg-purple-900/20 rounded-lg border border-purple-800">
                                                 <div className="flex items-center">
                                                     <i className="fas fa-image text-purple-500 mr-2"></i>
-                                                    <span className="text-sm text-gray-700 dark:text-gray-300 truncate">
+                                                    <span className="text-sm text-gray-300 truncate">
                                                         {file.name}
                                                     </span>
                                                 </div>
@@ -287,14 +292,14 @@ const AddChord = () => {
                             {/* Lyrics and Chords Section */}
                             <div className="group">
                                 <div className="flex items-center justify-between mb-4">
-                                    <h2 className="flex items-center text-xl font-semibold text-gray-800 dark:text-gray-200">
+                                    <h2 className="flex items-center text-xl font-semibold text-gray-200">
                                         <i className="fas fa-music mr-2 text-purple-500"></i>
                                         Lyrics and Chords
                                     </h2>
                                     <button 
                                         type="button"
                                         onClick={toggleSection} 
-                                        className="flex items-center px-4 py-2 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors duration-200"
+                                        className="flex items-center px-4 py-2 text-purple-400 hover:bg-purple-900/20 rounded-lg transition-colors duration-200"
                                     >
                                         <i className={`fas fa-chevron-${isOpen ? 'up' : 'down'} mr-2`}></i>
                                         {isOpen ? 'Collapse' : 'Expand'}
@@ -305,16 +310,16 @@ const AddChord = () => {
                                     {isOpen && (
                                         <div className="space-y-4">
                                             {lyrics.map((item, index) => (
-                                                <div key={index} className="p-6 bg-gradient-to-r from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow duration-200">
+                                                <div key={index} className="p-6 bg-gradient-to-r from-gray-700 to-gray-800 rounded-xl shadow-sm border border-gray-600 hover:shadow-md transition-shadow duration-200">
                                                     <div className="flex items-center justify-between mb-4">
-                                                        <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
+                                                        <span className="text-sm font-medium text-purple-400">
                                                             Section {index + 1}
                                                         </span>
                                                         <div className="flex space-x-2">
                                                             <button
                                                                 type="button"
                                                                 onClick={() => copyLine(index)}
-                                                                className="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors duration-200"
+                                                                className="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-900/20 rounded-lg transition-colors duration-200"
                                                                 title="Copy section"
                                                             >
                                                                 <i className="fas fa-copy"></i>
@@ -322,7 +327,7 @@ const AddChord = () => {
                                                             <button
                                                                 type="button"
                                                                 onClick={() => removeLine(index)}
-                                                                className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200"
+                                                                className="p-2 text-red-500 hover:text-red-700 hover:bg-red-900/20 rounded-lg transition-colors duration-200"
                                                                 title="Remove section"
                                                             >
                                                                 <i className="fas fa-trash"></i>
@@ -335,7 +340,7 @@ const AddChord = () => {
                                                             type="text"
                                                             value={item.section}
                                                             onChange={(e) => handleLyricsChange(index, "section", e.target.value)}
-                                                            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-600 dark:text-gray-300 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
+                                                            className="w-full p-3 border border-gray-600 rounded-lg bg-gray-600 text-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
                                                             placeholder="Section title (e.g., Verse 1, Chorus, Bridge)"
                                                         />
                                                         
@@ -347,9 +352,9 @@ const AddChord = () => {
                                                                 onChange={(e) => handleDocxUpload(e, index)}
                                                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                                             />
-                                                            <div className="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-purple-400 dark:hover:border-purple-500 transition-colors duration-200">
+                                                            <div className="flex items-center justify-center p-4 border-2 border-dashed border-gray-600 rounded-lg hover:border-purple-500 transition-colors duration-200">
                                                                 <i className="fas fa-file-word text-blue-500 mr-2"></i>
-                                                                <span className="text-gray-600 dark:text-gray-400">
+                                                                <span className="text-gray-400">
                                                                     Upload DOCX files for this section
                                                                 </span>
                                                             </div>
@@ -358,9 +363,9 @@ const AddChord = () => {
                                                         {item.docxFiles && item.docxFiles.length > 0 && (
                                                             <div className="space-y-2">
                                                                 {item.docxFiles.map((file, idx) => (
-                                                                    <div key={idx} className="flex items-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                                                    <div key={idx} className="flex items-center p-2 bg-blue-900/20 rounded-lg">
                                                                         <i className="fas fa-file-word text-blue-500 mr-2"></i>
-                                                                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                                                                        <span className="text-sm text-gray-300">
                                                                             {file.name}
                                                                         </span>
                                                                     </div>
@@ -374,7 +379,7 @@ const AddChord = () => {
                                             <button
                                                 type="button"
                                                 onClick={addLine}
-                                                className="flex items-center justify-center w-full p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-gray-600 dark:text-gray-400 hover:border-purple-400 dark:hover:border-purple-500 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all duration-200"
+                                                className="flex items-center justify-center w-full p-4 border-2 border-dashed border-gray-600 rounded-xl text-gray-400 hover:border-purple-500 hover:text-purple-400 hover:bg-purple-900/20 transition-all duration-200"
                                             >
                                                 <i className="fas fa-plus mr-2"></i>
                                                 Add New Section

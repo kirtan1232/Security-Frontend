@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AdminSidebar from "../../components/adminSidebar.jsx";
-import { useTheme } from "../../components/ThemeContext";
 
 const ViewLessons = () => {
-    const { theme } = useTheme(); // Get theme from context
     const [quizzes, setQuizzes] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -114,11 +112,18 @@ const ViewLessons = () => {
     }, {});
 
     return (
-        <div className="h-screen bg-gradient-to-br from-purple-100 to-blue-100 dark:from-gray-900 dark:to-gray-800 flex">
+        <div className="h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 flex">
+            {/* Animated background elements */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-10 left-10 w-64 h-64 bg-purple-800 rounded-full opacity-20 animate-pulse"></div>
+                <div className="absolute bottom-10 right-10 w-48 h-48 bg-blue-800 rounded-full opacity-20 animate-pulse delay-1000"></div>
+                <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-pink-800 rounded-full opacity-20 animate-pulse delay-2000"></div>
+            </div>
+            
             <AdminSidebar />
-            <div className="flex justify-center items-center w-full">
-                <div className="p-6 bg-white dark:bg-gray-800 dark:bg-opacity-80 rounded-lg shadow-md w-[65%] ml-[-5%] h-[90vh] flex flex-col">
-                    <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-200">View Lessons</h2>
+            <div className="flex justify-center items-center w-full relative z-10">
+                <div className="p-6 bg-gray-800/80 backdrop-blur-xl rounded-lg shadow-xl border border-gray-700/50 w-[65%] ml-[-5%] h-[90vh] flex flex-col">
+                    <h2 className="text-2xl font-bold mb-4 text-gray-200">View Lessons</h2>
                     <div className="flex justify-start space-x-8 mb-6">
                         {uniqueInstruments.map((instrument) => (
                             <span
@@ -126,8 +131,8 @@ const ViewLessons = () => {
                                 onClick={() => setSelectedInstrument(instrument)}
                                 className={`cursor-pointer ${
                                     selectedInstrument === instrument
-                                        ? "text-blue-500 dark:text-blue-400 underline font-semibold"
-                                        : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
+                                        ? "text-blue-400 underline font-semibold"
+                                        : "text-gray-300 hover:text-blue-400"
                                 }`}
                             >
                                 {instrument}
@@ -136,33 +141,33 @@ const ViewLessons = () => {
                     </div>
                     <div className="overflow-y-auto flex-grow p-2 space-y-4">
                         {loading ? (
-                            <p className="text-gray-700 dark:text-gray-300">Loading lessons...</p>
+                            <p className="text-gray-300">Loading lessons...</p>
                         ) : error ? (
-                            <p className="text-red-500 dark:text-red-400">{error}</p>
+                            <p className="text-red-400">{error}</p>
                         ) : uniqueDays.length > 0 ? (
                             uniqueDays.map((day) => (
-                                <div key={day} className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md">
-                                    <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">{day}</h3>
+                                <div key={day} className="p-4 bg-gray-700 rounded-lg shadow-md">
+                                    <h3 className="text-xl font-semibold mb-2 text-gray-200">{day}</h3>
                                     {quizzesByDay[day].length > 0 ? (
                                         quizzesByDay[day].map((quiz, index) => (
                                             <div
                                                 key={quiz._id}
-                                                className="p-4 bg-white dark:bg-gray-700 bg-opacity-60 backdrop-blur-lg rounded-xl shadow-md mb-4"
+                                                className="p-4 bg-gray-700 bg-opacity-60 backdrop-blur-lg rounded-xl shadow-md mb-4"
                                             >
                                                 <div className="flex justify-between items-center mb-2">
-                                                    <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                                                    <h4 className="text-lg font-semibold text-gray-200">
                                                         {quiz.instrument} Quiz {index + 1}
                                                     </h4>
                                                     <div>
                                                         <button
                                                             onClick={() => handleEditQuiz(quiz)}
-                                                            className="mr-2 px-3 py-1 bg-blue-500 dark:bg-blue-600 text-white rounded hover:bg-blue-600 dark:hover:bg-blue-700"
+                                                            className="mr-2 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
                                                         >
                                                             Edit
                                                         </button>
                                                         <button
                                                             onClick={() => handleDeleteQuiz(quiz._id)}
-                                                            className="px-3 py-1 bg-red-500 dark:bg-red-600 text-white rounded hover:bg-red-600 dark:hover:bg-red-700"
+                                                            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
                                                         >
                                                             Delete
                                                         </button>
@@ -171,7 +176,7 @@ const ViewLessons = () => {
                                                 {quiz.quizzes && quiz.quizzes.length > 0 ? (
                                                     quiz.quizzes.map((q, qIndex) => (
                                                         <div key={qIndex} className="mb-4">
-                                                            <p className="font-medium text-gray-700 dark:text-gray-300">
+                                                            <p className="font-medium text-gray-300">
                                                                 Question {qIndex + 1}: {q.question || 'No question available'}
                                                             </p>
                                                             {q.chordDiagram && (
@@ -188,98 +193,98 @@ const ViewLessons = () => {
                                                                 {q.options?.map((option, i) => (
                                                                     <li
                                                                         key={i}
-                                                                        className="p-1 rounded-md bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500"
+                                                                        className="p-1 rounded-md bg-gray-600 hover:bg-gray-500"
                                                                     >
                                                                         {option || 'No option available'}
                                                                     </li>
                                                                 ))}
                                                             </ul>
-                                                            <p className="text-blue-600 dark:text-blue-400 font-semibold mt-2">
+                                                            <p className="text-blue-400 font-semibold mt-2">
                                                                 Correct Answer: {q.correctAnswer || 'N/A'}
                                                             </p>
                                                         </div>
                                                     ))
                                                 ) : (
-                                                    <p className="text-gray-700 dark:text-gray-300">No quizzes available for this lesson.</p>
+                                                    <p className="text-gray-300">No quizzes available for this lesson.</p>
                                                 )}
                                             </div>
                                         ))
                                     ) : (
-                                        <p className="text-gray-500 dark:text-gray-400">No lessons available for {day} with {selectedInstrument}.</p>
+                                        <p className="text-gray-400">No lessons available for {day} with {selectedInstrument}.</p>
                                     )}
                                 </div>
                             ))
                         ) : (
-                            <p className="text-center text-gray-500 dark:text-gray-400">No lessons available. Try adding quizzes or check your connection.</p>
+                            <p className="text-center text-gray-400">No lessons available. Try adding quizzes or check your connection.</p>
                         )}
                     </div>
                 </div>
             </div>
             {editQuiz && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-[80%] max-w-4xl">
-                        <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200">Edit Quiz</h3>
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-gray-800 p-6 rounded-lg w-[80%] max-w-4xl border border-gray-700">
+                        <h3 className="text-xl font-bold mb-4 text-gray-200">Edit Quiz</h3>
                         <form onSubmit={handleEditSubmit}>
                             <div className="mb-4">
-                                <label className="block text-gray-700 dark:text-gray-300">Day</label>
+                                <label className="block text-gray-300">Day</label>
                                 <input
                                     type="text"
                                     value={editForm.day}
                                     onChange={(e) => handleEditFormChange('day', e.target.value)}
-                                    className="w-full p-2 border rounded dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
+                                    className="w-full p-2 border rounded bg-gray-700 text-gray-300 border-gray-600"
                                     required
                                 />
                             </div>
                             <div className="mb-4">
-                                <label className="block text-gray-700 dark:text-gray-300">Instrument</label>
+                                <label className="block text-gray-300">Instrument</label>
                                 <input
                                     type="text"
                                     value={editForm.instrument}
                                     onChange={(e) => handleEditFormChange('instrument', e.target.value)}
-                                    className="w-full p-2 border rounded dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
+                                    className="w-full p-2 border rounded bg-gray-700 text-gray-300 border-gray-600"
                                     required
                                 />
                             </div>
                             {editForm.quizzes.map((q, index) => (
-                                <div key={index} className="mb-4 p-4 bg-gray-100 dark:bg-gray-700 rounded">
-                                    <h4 className="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">Question {index + 1}</h4>
+                                <div key={index} className="mb-4 p-4 bg-gray-700 rounded">
+                                    <h4 className="text-lg font-semibold mb-2 text-gray-200">Question {index + 1}</h4>
                                     <div className="mb-2">
-                                        <label className="block text-gray-700 dark:text-gray-300">Question</label>
+                                        <label className="block text-gray-300">Question</label>
                                         <input
                                             type="text"
                                             value={q.question}
                                             onChange={(e) => handleEditFormChange('question', e.target.value, index)}
-                                            className="w-full p-2 border rounded dark:bg-gray-600 dark:text-gray-300 dark:border-gray-600"
+                                            className="w-full p-2 border rounded bg-gray-600 text-gray-300 border-gray-600"
                                             required
                                         />
                                     </div>
                                     <div className="mb-2">
-                                        <label className="block text-gray-700 dark:text-gray-300">Options (comma-separated)</label>
+                                        <label className="block text-gray-300">Options (comma-separated)</label>
                                         <input
                                             type="text"
                                             value={q.options}
                                             onChange={(e) => handleEditFormChange('options', e.target.value, index)}
-                                            className="w-full p-2 border rounded dark:bg-gray-600 dark:text-gray-300 dark:border-gray-600"
+                                            className="w-full p-2 border rounded bg-gray-600 text-gray-300 border-gray-600"
                                             required
                                         />
                                     </div>
                                     <div className="mb-2">
-                                        <label className="block text-gray-700 dark:text-gray-300">Correct Answer</label>
+                                        <label className="block text-gray-300">Correct Answer</label>
                                         <input
                                             type="text"
                                             value={q.correctAnswer}
                                             onChange={(e) => handleEditFormChange('correctAnswer', e.target.value, index)}
-                                            className="w-full p-2 border rounded dark:bg-gray-600 dark:text-gray-300 dark:border-gray-600"
+                                            className="w-full p-2 border rounded bg-gray-600 text-gray-300 border-gray-600"
                                             required
                                         />
                                     </div>
                                     <div className="mb-2">
-                                        <label className="block text-gray-700 dark:text-gray-300">Chord Diagram</label>
+                                        <label className="block text-gray-300">Chord Diagram</label>
                                         <input
                                             type="file"
                                             accept="image/*"
                                             onChange={(e) => handleEditFormChange('chordDiagram', e.target.files[0], index)}
-                                            className="w-full p-2 text-gray-700 dark:text-gray-300"
+                                            className="w-full p-2 text-gray-300"
                                         />
                                     </div>
                                 </div>
@@ -288,13 +293,13 @@ const ViewLessons = () => {
                                 <button
                                     type="button"
                                     onClick={() => setEditQuiz(null)}
-                                    className="mr-2 px-4 py-2 bg-gray-500 dark:bg-gray-600 text-white rounded hover:bg-gray-600 dark:hover:bg-gray-700"
+                                    className="mr-2 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-4 py-2 bg-blue-500 dark:bg-blue-600 text-white rounded hover:bg-blue-600 dark:hover:bg-blue-700"
+                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                                 >
                                     Save
                                 </button>

@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import AdminSidebar from "../../components/adminSidebar.jsx";
 import axios from "axios";
-import { useTheme } from "../../components/ThemeContext";
 
 export default function AddPracticeSession() {
-    const { theme } = useTheme();
     const [session, setSession] = useState({
         instrument: "Guitar",
         day: "Day 1",
@@ -101,14 +99,21 @@ export default function AddPracticeSession() {
     };
 
     return (
-        <div className="h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex overflow-hidden">
+        <div className="h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 flex overflow-hidden">
+            {/* Animated background elements */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-10 left-10 w-64 h-64 bg-purple-800 rounded-full opacity-20 animate-pulse"></div>
+                <div className="absolute bottom-10 right-10 w-48 h-48 bg-blue-800 rounded-full opacity-20 animate-pulse delay-1000"></div>
+                <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-pink-800 rounded-full opacity-20 animate-pulse delay-2000"></div>
+            </div>
+            
             <AdminSidebar />
-            <main className="flex-1 p-6 flex justify-center items-center overflow-hidden">
-                <div className="w-full max-w-4xl h-full bg-white/80 dark:bg-gray-800/90 backdrop-blur-sm border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+            <main className="flex-1 p-6 flex justify-center items-center overflow-hidden relative z-10">
+                <div className="w-full max-w-4xl h-full bg-gray-800/90 backdrop-blur-sm border border-gray-700/50 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
                     {/* Header - Fixed */}
-                    <div className="bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-700 dark:to-blue-700 p-6 text-white">
+                    <div className="bg-gradient-to-r from-purple-700 to-blue-700 p-6 text-white">
                         <h2 className="text-3xl font-bold mb-2">Add Practice Session</h2>
-                        <p className="text-purple-100 dark:text-purple-200">Create structured practice sessions for your musical journey</p>
+                        <p className="text-purple-200">Create structured practice sessions for your musical journey</p>
                     </div>
 
                     {/* Scrollable Content */}
@@ -117,7 +122,7 @@ export default function AddPracticeSession() {
                             {/* Instrument and Day Selection Row */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="group">
-                                    <label className="flex items-center text-gray-700 dark:text-gray-300 font-semibold mb-3">
+                                    <label className="flex items-center text-gray-300 font-semibold mb-3">
                                         <i className="fas fa-guitar mr-2 text-blue-500"></i>
                                         Select Instrument
                                     </label>
@@ -126,7 +131,7 @@ export default function AddPracticeSession() {
                                             name="instrument"
                                             value={session.instrument}
                                             onChange={handleChange}
-                                            className="w-full p-4 border-2 border-gray-200 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-gray-300 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 bg-white/50 dark:bg-gray-700/50 appearance-none cursor-pointer"
+                                            className="w-full p-4 border-2 border-gray-600 rounded-xl bg-gray-700/50 text-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 appearance-none cursor-pointer"
                                         >
                                             <option value="Guitar">🎸 Guitar</option>
                                             <option value="Piano">🎹 Piano</option>
@@ -137,7 +142,7 @@ export default function AddPracticeSession() {
                                 </div>
 
                                 <div className="group">
-                                    <label className="flex items-center text-gray-700 dark:text-gray-300 font-semibold mb-3">
+                                    <label className="flex items-center text-gray-300 font-semibold mb-3">
                                         <i className="fas fa-calendar-day mr-2 text-blue-500"></i>
                                         Practice Day
                                     </label>
@@ -146,7 +151,7 @@ export default function AddPracticeSession() {
                                             name="day"
                                             value={session.day}
                                             onChange={handleChange}
-                                            className="w-full p-4 border-2 border-gray-200 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-gray-300 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 bg-white/50 dark:bg-gray-700/50 appearance-none cursor-pointer"
+                                            className="w-full p-4 border-2 border-gray-600 rounded-xl bg-gray-700/50 text-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 appearance-none cursor-pointer"
                                         >
                                             <option value="Day 1">📅 Day 1</option>
                                             <option value="Day 2">📅 Day 2</option>
@@ -163,7 +168,7 @@ export default function AddPracticeSession() {
 
                             {/* Session Title */}
                             <div className="group">
-                                <label className="flex items-center text-gray-700 dark:text-gray-300 font-semibold mb-3">
+                                <label className="flex items-center text-gray-300 font-semibold mb-3">
                                     <i className="fas fa-heading mr-2 text-blue-500"></i>
                                     Session Title
                                 </label>
@@ -172,7 +177,7 @@ export default function AddPracticeSession() {
                                     name="title"
                                     value={session.title}
                                     onChange={handleChange}
-                                    className="w-full p-4 border-2 border-gray-200 dark:border-gray-600 rounded-xl shadow-sm dark:bg-gray-700 dark:text-gray-300 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 bg-white/50 dark:bg-gray-700/50"
+                                    className="w-full p-4 border-2 border-gray-600 rounded-xl shadow-sm bg-gray-700/50 text-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200"
                                     placeholder="Enter a descriptive title for your practice session..."
                                     required
                                 />
@@ -180,7 +185,7 @@ export default function AddPracticeSession() {
 
                             {/* Description */}
                             <div className="group">
-                                <label className="flex items-center text-gray-700 dark:text-gray-300 font-semibold mb-3">
+                                <label className="flex items-center text-gray-300 font-semibold mb-3">
                                     <i className="fas fa-align-left mr-2 text-blue-500"></i>
                                     Description
                                 </label>
@@ -188,7 +193,7 @@ export default function AddPracticeSession() {
                                     name="description"
                                     value={session.description}
                                     onChange={handleChange}
-                                    className="w-full p-4 border-2 border-gray-200 dark:border-gray-600 rounded-xl shadow-sm dark:bg-gray-700 dark:text-gray-300 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 bg-white/50 dark:bg-gray-700/50 resize-none"
+                                    className="w-full p-4 border-2 border-gray-600 rounded-xl shadow-sm bg-gray-700/50 text-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 resize-none"
                                     rows="4"
                                     placeholder="Provide a brief overview of what this practice session covers..."
                                     required
@@ -197,7 +202,7 @@ export default function AddPracticeSession() {
 
                             {/* Duration */}
                             <div className="group">
-                                <label className="flex items-center text-gray-700 dark:text-gray-300 font-semibold mb-3">
+                                <label className="flex items-center text-gray-300 font-semibold mb-3">
                                     <i className="fas fa-clock mr-2 text-blue-500"></i>
                                     Duration (minutes)
                                 </label>
@@ -206,7 +211,7 @@ export default function AddPracticeSession() {
                                     name="duration"
                                     value={session.duration}
                                     onChange={handleChange}
-                                    className="w-full p-4 border-2 border-gray-200 dark:border-gray-600 rounded-xl shadow-sm dark:bg-gray-700 dark:text-gray-300 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 bg-white/50 dark:bg-gray-700/50"
+                                    className="w-full p-4 border-2 border-gray-600 rounded-xl shadow-sm bg-gray-700/50 text-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200"
                                     min="1"
                                     placeholder="How long should this practice session be?"
                                     required
@@ -215,7 +220,7 @@ export default function AddPracticeSession() {
 
                             {/* Instructions */}
                             <div className="group">
-                                <label className="flex items-center text-gray-700 dark:text-gray-300 font-semibold mb-3">
+                                <label className="flex items-center text-gray-300 font-semibold mb-3">
                                     <i className="fas fa-list-ol mr-2 text-blue-500"></i>
                                     Practice Instructions
                                 </label>
@@ -223,7 +228,7 @@ export default function AddPracticeSession() {
                                     name="instructions"
                                     value={session.instructions}
                                     onChange={handleChange}
-                                    className="w-full p-4 border-2 border-gray-200 dark:border-gray-600 rounded-xl shadow-sm dark:bg-gray-700 dark:text-gray-300 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 bg-white/50 dark:bg-gray-700/50 resize-none"
+                                    className="w-full p-4 border-2 border-gray-600 rounded-xl shadow-sm bg-gray-700/50 text-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 resize-none"
                                     rows="6"
                                     placeholder="Write detailed step-by-step instructions for this practice session..."
                                     required
@@ -232,8 +237,7 @@ export default function AddPracticeSession() {
 
                             {/* YouTube URL */}
                             <div className="group">
-                                <label className="flex items-center text-gray-7
-00 dark:text-gray-300 font-semibold mb-3">
+                                <label className="flex items-center text-gray-300 font-semibold mb-3">
                                     <i className="fab fa-youtube mr-2 text-red-500"></i>
                                     YouTube Video URL (Optional)
                                 </label>
@@ -242,10 +246,10 @@ export default function AddPracticeSession() {
                                     name="mediaUrl"
                                     value={session.mediaUrl}
                                     onChange={handleChange}
-                                    className="w-full p-4 border-2 border-gray-200 dark:border-gray-600 rounded-xl shadow-sm dark:bg-gray-700 dark:text-gray-300 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 bg-white/50 dark:bg-gray-700/50"
+                                    className="w-full p-4 border-2 border-gray-600 rounded-xl shadow-sm bg-gray-700/50 text-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200"
                                     placeholder="https://www.youtube.com/watch?v=..."
                                 />
-                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                                <p className="text-sm text-gray-400 mt-2">
                                     <i className="fas fa-info-circle mr-1"></i>
                                     Add a YouTube video to help guide the practice session
                                 </p>
@@ -253,28 +257,28 @@ export default function AddPracticeSession() {
 
                             {/* Error Message */}
                             {error && (
-                                <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+                                <div className="p-4 bg-red-900/20 border border-red-800 rounded-xl">
                                     <div className="flex items-center">
                                         <i className="fas fa-exclamation-triangle text-red-500 mr-2"></i>
-                                        <p className="text-red-700 dark:text-red-400">{error}</p>
+                                        <p className="text-red-400">{error}</p>
                                     </div>
                                 </div>
                             )}
 
                             {/* Success Message */}
                             {success && (
-                                <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
+                                <div className="p-4 bg-green-900/20 border border-green-800 rounded-xl">
                                     <div className="flex items-center mb-2">
                                         <i className="fas fa-check-circle text-green-500 mr-2"></i>
-                                        <p className="text-green-700 dark:text-green-400">{success}</p>
+                                        <p className="text-green-400">{success}</p>
                                     </div>
                                     {savedFile && (
                                         <div className="mt-4">
-                                            <h3 className="text-gray-800 dark:text-gray-200 font-semibold mb-2 flex items-center">
+                                            <h3 className="text-gray-200 font-semibold mb-2 flex items-center">
                                                 <i className="fas fa-play-circle mr-2"></i>
                                                 Video Preview:
                                             </h3>
-                                            <div className="aspect-video bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
+                                            <div className="aspect-video bg-gray-700 rounded-lg overflow-hidden">
                                                 <iframe
                                                     src={getYouTubeEmbedUrl(savedFile)}
                                                     frameBorder="0"

@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../components/adminSidebar.jsx";
-import { useTheme } from "../../components/ThemeContext";
 import { Line, Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faBook, faMusic, faDonate, faChartLine, faEye, faFire ,faUsers} from "@fortawesome/free-solid-svg-icons";
+import { faUser, faBook, faMusic, faDonate, faChartLine, faEye, faFire, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 
@@ -17,7 +16,6 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcEleme
 const AdminDashboard = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { theme } = useTheme();
     const [state, setState] = useState({
         userProfile: null,
         totalUsers: 0,
@@ -209,7 +207,7 @@ const AdminDashboard = () => {
                     display: true,
                     position: 'top',
                     labels: {
-                        color: theme === 'dark' ? '#e5e7eb' : '#374151',
+                        color: '#e5e7eb',
                         padding: 20,
                         font: { size: 14, weight: 'bold' },
                     },
@@ -217,7 +215,7 @@ const AdminDashboard = () => {
                 title: {
                     display: true,
                     text: t('Cumulative Metrics Over Time'),
-                    color: theme === 'dark' ? '#e5e7eb' : '#374151',
+                    color: '#e5e7eb',
                     font: { size: 18, weight: 'bold' },
                     padding: 20,
                 },
@@ -225,12 +223,12 @@ const AdminDashboard = () => {
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: { color: theme === 'dark' ? '#e5e7eb' : '#374151', font: { size: 12 } },
-                    grid: { color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' },
+                    ticks: { color: '#e5e7eb', font: { size: 12 } },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
                 },
                 x: {
                     ticks: { 
-                        color: theme === 'dark' ? '#e5e7eb' : '#374151',
+                        color: '#e5e7eb',
                         maxRotation: 45,
                         minRotation: 45,
                         font: { size: 12 }
@@ -249,7 +247,7 @@ const AdminDashboard = () => {
                     display: true,
                     position: 'right',
                     labels: {
-                        color: theme === 'dark' ? '#e5e7eb' : '#374151',
+                        color: '#e5e7eb',
                         padding: 20,
                         font: { size: 14, weight: 'bold' },
                     },
@@ -257,7 +255,7 @@ const AdminDashboard = () => {
                 title: {
                     display: true,
                     text: t('Dashboard Metrics Distribution'),
-                    color: theme === 'dark' ? '#e5e7eb' : '#374151',
+                    color: '#e5e7eb',
                     font: { size: 18, weight: 'bold' },
                     padding: 20,
                 },
@@ -355,23 +353,30 @@ const AdminDashboard = () => {
     };
 
     return (
-        <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-slate-900 flex flex-col md:flex-row overflow-hidden ${t('language') === 'ne' ? 'font-noto-sans' : ''}`}>
+        <div className={`min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 flex flex-col md:flex-row overflow-hidden ${t('language') === 'ne' ? 'font-noto-sans' : ''}`}>
+            {/* Animated background elements */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-10 left-10 w-64 h-64 bg-purple-800 rounded-full opacity-20 animate-pulse"></div>
+                <div className="absolute bottom-10 right-10 w-48 h-48 bg-blue-800 rounded-full opacity-20 animate-pulse delay-1000"></div>
+                <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-pink-800 rounded-full opacity-20 animate-pulse delay-2000"></div>
+            </div>
+            
             <AdminSidebar />
-            <main className="flex-1 p-4 md:p-6 flex justify-center items-start mt-4 md:mt-6">
-                <div className="bg-white/80 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-[95vw] md:max-w-[90vw] max-h-[90vh] overflow-y-auto border border-white/20">
+            <main className="flex-1 p-4 md:p-6 flex justify-center items-start mt-4 md:mt-6 relative z-10">
+                <div className="bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-[95vw] md:max-w-[90vw] max-h-[90vh] overflow-y-auto border border-gray-700/50">
                     <header className={`flex flex-col md:flex-row justify-between items-center mb-8 transition-all duration-1000 ${
                         state.isLoaded ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'
                     }`}>
                         <div>
-                            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
+                            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
                                 {t('Admin Dashboard')}
                             </h1>
                             <div className="h-1 w-20 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></div>
                         </div>
                         <div className="flex items-center space-x-4 mt-4 md:mt-0">
                             <div className="text-right">
-                                <p className="text-sm text-gray-600 dark:text-gray-400">{t('Welcome back')}</p>
-                                <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                                <p className="text-sm text-gray-400">{t('Welcome back')}</p>
+                                <p className="text-lg font-semibold text-gray-200">
                                     {state.userProfile ? state.userProfile.name : t('Admin')}
                                 </p>
                             </div>
@@ -382,7 +387,7 @@ const AdminDashboard = () => {
                     </header>
 
                     {state.error && (
-                        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-200 rounded-xl backdrop-blur-sm">
+                        <div className="mb-6 p-4 bg-red-900/30 border border-red-700 text-red-200 rounded-xl backdrop-blur-sm">
                             <div className="flex items-center">
                                 <FontAwesomeIcon icon={faFire} className="mr-2" />
                                 {t('Error')}: {state.error}
@@ -432,12 +437,12 @@ const AdminDashboard = () => {
                             </div>
 
                             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
-                                <div className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-xl p-6 border border-white/20 transition-all duration-1000 ${
+                                <div className={`bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-xl p-6 border border-gray-700/50 transition-all duration-1000 ${
                                     state.isLoaded ? 'translate-x-0 opacity-100' : '-translate-x-8 opacity-0'
                                 }`} style={{ transitionDelay: '600ms' }}>
                                     <div className="flex items-center mb-4">
                                         <FontAwesomeIcon icon={faChartLine} className="text-2xl text-purple-600 mr-3" />
-                                        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">{t('Growth Analytics')}</h3>
+                                        <h3 className="text-xl font-bold text-gray-200">{t('Growth Analytics')}</h3>
                                     </div>
                                     <div className="h-80">
                                         {(state.usersData.length > 0 || state.lessonsData.length > 0 || state.songsData.length > 0) ? (
@@ -446,19 +451,19 @@ const AdminDashboard = () => {
                                             <div className="flex items-center justify-center h-full">
                                                 <div className="text-center">
                                                     <FontAwesomeIcon icon={faChartLine} className="text-4xl text-gray-400 mb-4" />
-                                                    <p className="text-gray-600 dark:text-gray-400">{t('No data available for line chart')}</p>
+                                                    <p className="text-gray-400">{t('No data available for line chart')}</p>
                                                 </div>
                                             </div>
                                         )}
                                     </div>
                                 </div>
 
-                                <div className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-xl p-6 border border-white/20 transition-all duration-1000 ${
+                                <div className={`bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-xl p-6 border border-gray-700/50 transition-all duration-1000 ${
                                     state.isLoaded ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'
                                 }`} style={{ transitionDelay: '700ms' }}>
                                     <div className="flex items-center mb-4">
                                         <FontAwesomeIcon icon={faEye} className="text-2xl text-blue-600 mr-3" />
-                                        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">{t('Distribution Overview')}</h3>
+                                        <h3 className="text-xl font-bold text-gray-200">{t('Distribution Overview')}</h3>
                                     </div>
                                     <div className="h-80">
                                         <Doughnut data={doughnutChartData} options={chartOptions.doughnut} />
@@ -466,12 +471,12 @@ const AdminDashboard = () => {
                                 </div>
                             </div>
 
-                            <div className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-xl p-6 border border-white/20 transition-all duration-1000 ${
+                            <div className={`bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-xl p-6 border border-gray-700/50 transition-all duration-1000 ${
                                 state.isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
                             }`} style={{ transitionDelay: '800ms' }}>
                                 <div className="flex items-center mb-4">
                                     <FontAwesomeIcon icon={faChartLine} className="text-2xl text-green-600 mr-3" />
-                                    <h3 className="text-xl  font-bold text-gray-800 dark:text-gray-200">{t('Calendar View')}</h3>
+                                    <h3 className="text-xl font-bold text-gray-200">{t('Calendar View')}</h3>
                                 </div>
                                 <div className="calendar-container">
                                     <style jsx>{`
@@ -481,7 +486,7 @@ const AdminDashboard = () => {
                                             border: none;
                                             font-family: inherit;
                                             line-height: 1.125em;
-                                            color: ${theme === 'dark' ? '#e5e7eb' : '#374151'};
+                                            color: #e5e7eb;
                                         }
                                         .calendar-container .react-calendar__tile {
                                             padding: 10px 6px;
@@ -507,11 +512,11 @@ const AdminDashboard = () => {
                                             text-transform: uppercase;
                                             font-weight: bold;
                                             font-size: 12px;
-                                            color: ${theme === 'dark' ? '#9ca3af' : '#6b7280'};
+                                            color: #9ca3af;
                                         }
                                         .calendar-container .react-calendar__navigation button {
                                             background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));
-                                            color: ${theme === 'dark' ? '#e5e7eb' : '#374151'};
+                                            color: #e5e7eb;
                                             font-size: 16px;
                                             font-weight: bold;
                                             border-radius: 12px;

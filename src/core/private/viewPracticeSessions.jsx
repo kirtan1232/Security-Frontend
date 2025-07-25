@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AdminSidebar from "../../components/adminSidebar.jsx";
-import { useTheme } from "../../components/ThemeContext";
 
 const ViewPracticeSessions = () => {
-    const { theme } = useTheme(); // Get theme from context
     const [sessions, setSessions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -167,7 +165,7 @@ const ViewPracticeSessions = () => {
                         alt="Practice Session Image"
                         className="max-w-full max-h-[200px] object-contain"
                         onError={(e) => {
-                            e.target.outerHTML = `<a href="https://localhost:3000/${file}" target="_blank" class="text-blue-500 dark:text-blue-400 underline">${file}</a>`;
+                            e.target.outerHTML = `<a href="https://localhost:3000/${file}" target="_blank" class="text-blue-400 underline">${file}</a>`;
                         }}
                     />
                 </div>
@@ -181,7 +179,7 @@ const ViewPracticeSessions = () => {
                         controls
                         className="max-w-full max-h-[200px] object-contain"
                         onError={(e) => {
-                            e.target.outerHTML = `<a href="https://localhost:3000/${file}" target="_blank" class="text-blue-500 dark:text-blue-400 underline">${file}</a>`;
+                            e.target.outerHTML = `<a href="https://localhost:3000/${file}" target="_blank" class="text-blue-400 underline">${file}</a>`;
                         }}
                     >
                         <source src={`https://localhost:3000/${file}`} type={`video/${fileExtension}`} />
@@ -192,18 +190,25 @@ const ViewPracticeSessions = () => {
         }
 
         return (
-            <a href={`https://localhost:3000/${file}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 dark:text-blue-400 underline">
+            <a href={`https://localhost:3000/${file}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">
                 {file}
             </a>
         );
     };
 
     return (
-        <div className="h-screen bg-gradient-to-br from-purple-100 to-blue-100 dark:from-gray-900 dark:to-gray-800 flex">
+        <div className="h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 flex">
+            {/* Animated background elements */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-10 left-10 w-64 h-64 bg-purple-800 rounded-full opacity-20 animate-pulse"></div>
+                <div className="absolute bottom-10 right-10 w-48 h-48 bg-blue-800 rounded-full opacity-20 animate-pulse delay-1000"></div>
+                <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-pink-800 rounded-full opacity-20 animate-pulse delay-2000"></div>
+            </div>
+            
             <AdminSidebar />
-            <div className="flex justify-center items-center w-full">
-                <div className="p-6 bg-white dark:bg-gray-800 dark:bg-opacity-80 rounded-lg shadow-md w-[65%] ml-[-5%] h-[90vh] flex flex-col">
-                    <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-200">View Practice Sessions</h2>
+            <div className="flex justify-center items-center w-full relative z-10">
+                <div className="p-6 bg-gray-800/80 backdrop-blur-xl rounded-lg shadow-xl border border-gray-700/50 w-[65%] ml-[-5%] h-[90vh] flex flex-col">
+                    <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">View Practice Sessions</h2>
                     <div className="flex justify-start space-x-8 mb-6">
                         {uniqueInstruments.map((instrument) => (
                             <span
@@ -211,8 +216,8 @@ const ViewPracticeSessions = () => {
                                 onClick={() => setSelectedInstrument(instrument)}
                                 className={`cursor-pointer ${
                                     selectedInstrument === instrument
-                                        ? "text-blue-500 dark:text-blue-400 underline font-semibold"
-                                        : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
+                                        ? "text-blue-400 underline font-semibold"
+                                        : "text-gray-300 hover:text-blue-400"
                                 }`}
                             >
                                 {instrument}
@@ -221,36 +226,36 @@ const ViewPracticeSessions = () => {
                     </div>
                     <div className="overflow-y-auto flex-grow p-2">
                         {loading ? (
-                            <p className="text-gray-700 dark:text-gray-300">Loading...</p>
+                            <p className="text-gray-300">Loading...</p>
                         ) : error ? (
-                            <p className="text-red-500 dark:text-red-400">{error}</p>
+                            <p className="text-red-400">{error}</p>
                         ) : filteredSessions.length > 0 ? (
                             <ul className="space-y-2">
                                 {filteredSessions.map((session) => (
-                                    <li key={session._id} className="p-4 bg-gray-100 dark:bg-gray-700 rounded shadow">
+                                    <li key={session._id} className="p-4 bg-gray-700 rounded shadow">
                                         <div className="flex justify-between items-center">
-                                            <strong className="text-gray-800 dark:text-gray-200">{session.title}</strong>
+                                            <strong className="text-gray-200">{session.title}</strong>
                                             <div>
                                                 <button
                                                     onClick={() => handleEdit(session)}
-                                                    className="px-3 py-1 bg-blue-500 dark:bg-blue-600 text-white rounded-lg mr-2"
+                                                    className="px-3 py-1 bg-blue-600 text-white rounded-lg mr-2"
                                                 >
                                                     Edit
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(session._id)}
-                                                    className="px-3 py-1 bg-red-500 dark:bg-red-600 text-white rounded-lg"
+                                                    className="px-3 py-1 bg-red-600 text-white rounded-lg"
                                                 >
                                                     Delete
                                                 </button>
                                             </div>
                                         </div>
-                                        <p className="text-gray-700 dark:text-gray-300">Day: {session.day}, Instrument: {session.instrument}, Duration: {session.duration} mins</p>
-                                        <p className="mt-1 text-gray-700 dark:text-gray-300"><strong>Description:</strong> {session.description}</p>
-                                        <p className="mt-1 text-gray-700 dark:text-gray-300"><strong>Instructions:</strong> {session.instructions}</p>
+                                        <p className="text-gray-300">Day: {session.day}, Instrument: {session.instrument}, Duration: {session.duration} mins</p>
+                                        <p className="mt-1 text-gray-300"><strong>Description:</strong> {session.description}</p>
+                                        <p className="mt-1 text-gray-300"><strong>Instructions:</strong> {session.instructions}</p>
                                         {session.file && (
                                             <div className="mt-2">
-                                                <p className="font-semibold text-gray-800 dark:text-gray-200">Media:</p>
+                                                <p className="font-semibold text-gray-200">Media:</p>
                                                 {renderMedia(session.file)}
                                             </div>
                                         )}
@@ -258,22 +263,22 @@ const ViewPracticeSessions = () => {
                                 ))}
                             </ul>
                         ) : (
-                            <p className="text-gray-700 dark:text-gray-300">No practice sessions available.</p>
+                            <p className="text-gray-300">No practice sessions available.</p>
                         )}
                     </div>
                 </div>
             </div>
             {editSession && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-1/2 max-h-[80vh] overflow-y-auto">
-                        <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200">Edit Session</h3>
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-1/2 max-h-[80vh] overflow-y-auto border border-gray-700">
+                        <h3 className="text-xl font-bold mb-4 text-gray-200">Edit Session</h3>
                         <form onSubmit={handleEditSubmit} className="space-y-4">
                             <div>
-                                <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">Instrument</label>
+                                <label className="block text-gray-300 font-medium mb-2">Instrument</label>
                                 <select
                                     value={editFormData.instrument}
                                     onChange={(e) => handleFormChange(e, "instrument")}
-                                    className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
+                                    className="w-full p-2 border rounded-lg bg-gray-700 text-gray-300 border-gray-600"
                                 >
                                     <option value="guitar">Guitar</option>
                                     <option value="piano">Piano</option>
@@ -281,82 +286,82 @@ const ViewPracticeSessions = () => {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">Day</label>
+                                <label className="block text-gray-300 font-medium mb-2">Day</label>
                                 <input
                                     type="text"
                                     value={editFormData.day}
                                     onChange={(e) => handleFormChange(e, "day")}
-                                    className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
+                                    className="w-full p-2 border rounded-lg bg-gray-700 text-gray-300 border-gray-600"
                                     placeholder="e.g., Monday"
                                 />
                             </div>
                             <div>
-                                <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">Title</label>
+                                <label className="block text-gray-300 font-medium mb-2">Title</label>
                                 <input
                                     type="text"
                                     value={editFormData.title}
                                     onChange={(e) => handleFormChange(e, "title")}
-                                    className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
+                                    className="w-full p-2 border rounded-lg bg-gray-700 text-gray-300 border-gray-600"
                                     placeholder="Session title"
                                 />
                             </div>
                             <div>
-                                <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">Description</label>
+                                <label className="block text-gray-300 font-medium mb-2">Description</label>
                                 <textarea
                                     value={editFormData.description}
                                     onChange={(e) => handleFormChange(e, "description")}
-                                    className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
+                                    className="w-full p-2 border rounded-lg bg-gray-700 text-gray-300 border-gray-600"
                                     placeholder="Session description"
                                 />
                             </div>
                             <div>
-                                <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">Duration (minutes)</label>
+                                <label className="block text-gray-300 font-medium mb-2">Duration (minutes)</label>
                                 <input
                                     type="number"
                                     value={editFormData.duration}
                                     onChange={(e) => handleFormChange(e, "duration")}
-                                    className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
+                                    className="w-full p-2 border rounded-lg bg-gray-700 text-gray-300 border-gray-600"
                                     placeholder="Duration in minutes"
                                 />
                             </div>
                             <div>
-                                <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">Instructions</label>
+                                <label className="block text-gray-300 font-medium mb-2">Instructions</label>
                                 <textarea
                                     value={editFormData.instructions}
                                     onChange={(e) => handleFormChange(e, "instructions")}
-                                    className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
+                                    className="w-full p-2 border rounded-lg bg-gray-700 text-gray-300 border-gray-600"
                                     placeholder="Session instructions"
                                 />
                             </div>
                             <div>
-                                <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">YouTube URL (optional)</label>
+                                <label className="block text-gray-300 font-medium mb-2">YouTube URL (optional)</label>
                                 <input
                                     type="text"
                                     value={editFormData.mediaUrl}
                                     onChange={(e) => handleFormChange(e, "mediaUrl")}
-                                    className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
+                                    className="w-full p-2 border rounded-lg bg-gray-700 text-gray-300 border-gray-600"
                                     placeholder="YouTube URL"
                                 />
                             </div>
                             <div>
-                                <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">Upload Media (optional)</label>
+                                <label className="block text-gray-300 font-medium mb-2">Upload Media (optional)</label>
                                 <input
                                     type="file"
                                     onChange={(e) => handleFormChange(e, "file")}
-                                    className="w-full p-2 text-gray-700 dark:text-gray-300"
+                                    className="w-full p-2 text-gray-300"
                                 />
                             </div>
                             <div className="flex justify-end space-x-2">
                                 <button
                                     type="button"
                                     onClick={() => setEditSession(null)}
-                                    className="px-3 py-1 bg-gray-300 dark:bg-gray-600 text-black dark:text-white rounded-lg"
+                                    className="px-3 py-1 bg-gray-600 text-white rounded-lg"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-3 py-1 bg-green-500 dark:bg-green-600 text-white rounded-lg"
+                                    className="px-3 py-1 bg-green-600 text-white rounded-lg"
                                 >
                                     Save Changes
                                 </button>

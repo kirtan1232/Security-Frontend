@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTheme } from "../../components/ThemeContext";
 import Sidebar from "../../components/sidebar.jsx";
 import Swal from "sweetalert2";
 
@@ -154,14 +153,14 @@ const Meter = ({ cents, isInTune }) => {
   return (
     <div className="meter relative w-full h-64 mx-auto my-8">
       <div className={`meter-pointer absolute w-1 h-full transition-transform duration-300 ${
-        isInTune ? 'bg-green-500' : 'bg-gray-800 dark:bg-gray-200'
+        isInTune ? 'bg-green-500' : 'bg-gray-200'
       }`}
            style={{ transform: `rotate(${rotation}deg)`, right: '50%', transformOrigin: 'bottom' }}></div>
-      <div className="meter-dot absolute w-3 h-3 bg-gray-800 dark:bg-gray-200 rounded-full bottom-0"
+      <div className="meter-dot absolute w-3 h-3 bg-gray-200 rounded-full bottom-0"
            style={{ right: '50%', marginRight: '-5px' }}></div>
       {[...Array(11)].map((_, i) => (
         <div key={i} 
-             className={`meter-scale absolute w-1 h-full border-t-8 border-gray-800 dark:border-gray-200 transition-transform duration-200`}
+             className={`meter-scale absolute w-1 h-full border-t-8 border-gray-200 transition-transform duration-200`}
              style={{ 
                transform: `rotate(${i * 9 - 45}deg)`, 
                right: '50%', 
@@ -176,7 +175,7 @@ const Meter = ({ cents, isInTune }) => {
 const Note = ({ name, octave }) => {
   return (
     <div className="note text-center my-4">
-      <span className="text-6xl font-bold text-gray-800 dark:text-gray-100">
+      <span className="text-6xl font-bold text-gray-100">
         {name[0]}
         {name[1] && <span className="text-4xl">{name[1]}</span>}
         <span className="text-2xl align-bottom">{octave}</span>
@@ -186,7 +185,6 @@ const Note = ({ name, octave }) => {
 };
 
 const TunerComponent = () => {
-  const { theme } = useTheme();
   const [instrument, setInstrument] = useState("guitar");
   const [selectedString, setSelectedString] = useState(0);
   const [note, setNote] = useState({ name: "A", octave: 4, frequency: 440, cents: 0 });
@@ -364,18 +362,25 @@ const TunerComponent = () => {
   }, []);
 
   return (
-    <div className={`h-screen flex ${theme === 'light' ? 'bg-gradient-to-br from-purple-100 to-blue-100' : 'bg-gradient-to-br from-gray-900 to-gray-800'}`}>
+    <div className="h-screen flex bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900">
+      {/* Animated background elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-10 left-10 w-64 h-64 bg-purple-800 rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute bottom-10 right-10 w-48 h-48 bg-blue-800 rounded-full opacity-20 animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-pink-800 rounded-full opacity-20 animate-pulse delay-2000"></div>
+      </div>
+      
       <Sidebar />
-      <main className="flex-1 p-6 flex justify-center items-start mt-4">
-        <div className={`bg-white bg-opacity-60 backdrop-blur-lg dark:bg-gray-800 dark:bg-opacity-80 rounded-3xl shadow-lg p-8 w-full max-w-7xl h-[85vh]`}>
+      <main className="flex-1 p-6 flex justify-center items-start mt-4 relative z-10">
+        <div className="bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-700/50 p-8 w-full max-w-7xl h-[85vh]">
           <div className="flex justify-between items-center mb-4">
             <button 
               onClick={updateA4}
-              className="text-gray-700 dark:text-gray-200 font-medium"
+              className="text-gray-200 font-medium"
             >
               A<sub>4</sub> = <span className="text-red-500">{a4}</span> Hz
             </button>
-            <label className="flex items-center gap-2 text-gray-700 dark:text-gray-200">
+            <label className="flex items-center gap-2 text-gray-200">
               Turn On/Off
               <input 
                 type="checkbox" 
@@ -386,7 +391,10 @@ const TunerComponent = () => {
             </label>
           </div>
           
-          <h2 className="text-2xl font-bold text-gray-400 dark:text-gray-200 mb-4 text-center">Instrument Tuner</h2>
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-4 text-center">
+            Instrument Tuner
+          </h2>
+          
           <div className="flex gap-2 mb-4 justify-center">
             {Object.keys(instruments).map((inst) => (
               <button
@@ -397,15 +405,16 @@ const TunerComponent = () => {
                 }}
                 className={`px-4 py-2 rounded-lg text-lg font-medium transition-all duration-300 shadow-md ${
                   instrument === inst
-                    ? "bg-blue-200 text-black dark:bg-blue-600 dark:text-white"
-                    : "bg-gray-300 text-gray-700 hover:bg-purple-400 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-purple-600"
+                    ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+                    : "bg-gray-700 text-gray-200 hover:bg-gray-600"
                 }`}
               >
                 {inst.charAt(0).toUpperCase() + inst.slice(1)}
               </button>
             ))}
           </div>
-          <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 text-center">Select String</h3>
+          
+          <h3 className="text-lg font-semibold text-gray-200 mb-2 text-center">Select String</h3>
           <div className="flex flex-wrap justify-center gap-2 mb-4">
             {stringNotes.map((stringNote, index) => (
               <button
@@ -413,8 +422,8 @@ const TunerComponent = () => {
                 onClick={() => handleSelectString(index)}
                 className={`px-4 py-2 rounded-lg text-lg font-medium transition-all duration-300 shadow-md ${
                   selectedString === index
-                    ? "bg-purple-300 text-white dark:bg-purple-600 dark:text-white"
-                    : "bg-gray-400 text-white hover:bg-gray-600 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
+                    ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white"
+                    : "bg-gray-600 text-gray-200 hover:bg-gray-500"
                 }`}
               >
                 {stringNote}
@@ -424,32 +433,39 @@ const TunerComponent = () => {
           
           <Meter cents={note.cents} isInTune={tuningComplete} />
           <Note name={note.name} octave={note.octave} />
-          <p className="text-xl text-gray-900 dark:text-gray-100 mt-2 font-semibold text-center">{note.frequency.toFixed(1)} Hz</p>
+          <p className="text-xl text-gray-100 mt-2 font-semibold text-center">{note.frequency.toFixed(1)} Hz</p>
           
           {messageVisible && (
             <div className="mt-4 text-center">
-              <p className="text-green-500 dark:text-green-400 font-semibold text-lg">{tuningMessage}</p>
+              <p className="text-green-400 font-semibold text-lg">{tuningMessage}</p>
             </div>
           )}
         </div>
       </main>
-      <aside className="w-36 bg-white bg-opacity-10 backdrop-blur-lg dark:bg-gray-900 dark:bg-opacity-50 p-2 flex flex-col items-center">
-        {userProfile && userProfile.profilePicture ? (
-          <img
-            src={`https://localhost:3000/${userProfile.profilePicture}`}
-            alt="Profile"
-            className="w-16 h-16 rounded-full border border-gray-300 dark:border-gray-600 cursor-pointer mt-4"
-            onClick={() => navigate("/profile")}
-          />
-        ) : (
-          <img
-            src="src/assets/images/profile.png"
-            alt="Profile"
-            className="w-16 h-16 rounded-full border border-gray-300 dark:border-gray-600 cursor-pointer mt-4"
-            onClick={() => navigate("/profile")}
-          />
-        )}
-      </aside>
+      
+      {/* Enhanced Profile Picture */}
+      <div className="absolute top-4 right-4 z-20">
+        <div className="relative group">
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-300"></div>
+          <div className="relative bg-gray-800/80 backdrop-blur-lg rounded-full p-1">
+            {userProfile && userProfile.profilePicture ? (
+              <img
+                src={`https://localhost:3000/${userProfile.profilePicture}`}
+                alt="Profile"
+                className="w-16 h-16 rounded-full border-2 border-gray-600 cursor-pointer hover:scale-110 transition-transform duration-300"
+                onClick={() => navigate("/profile")}
+              />
+            ) : (
+              <img
+                src="src/assets/images/profile.png"
+                alt="Profile"
+                className="w-16 h-16 rounded-full border-2 border-gray-600 cursor-pointer hover:scale-110 transition-transform duration-300"
+                onClick={() => navigate("/profile")}
+              />
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

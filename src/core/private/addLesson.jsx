@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import AdminSidebar from "../../components/adminSidebar.jsx";
-import { useTheme } from "../../components/ThemeContext";
 
 export default function AddQuiz() {
-    const { theme } = useTheme();
     const [day, setDay] = useState("");
     const [quizzes, setQuizzes] = useState([]);
     const [docxFiles, setDocxFiles] = useState([]);
@@ -119,31 +117,38 @@ export default function AddQuiz() {
     };
 
     return (
-        <div className="h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex">
+        <div className="h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 flex">
+            {/* Animated background elements */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-10 left-10 w-64 h-64 bg-purple-800 rounded-full opacity-20 animate-pulse"></div>
+                <div className="absolute bottom-10 right-10 w-48 h-48 bg-blue-800 rounded-full opacity-20 animate-pulse delay-1000"></div>
+                <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-pink-800 rounded-full opacity-20 animate-pulse delay-2000"></div>
+            </div>
+            
             <AdminSidebar />
-            <div className="flex-1 flex justify-center items-center p-4">
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">
+            <div className="flex-1 flex justify-center items-center p-4 relative z-10">
+                <div className="bg-gray-800/80 backdrop-blur-xl border border-gray-700/50 rounded-xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-700 dark:to-blue-700 p-6 text-white">
+                    <div className="bg-gradient-to-r from-purple-700 to-blue-700 p-6 text-white">
                         <h2 className="text-3xl font-bold mb-2">Add New Quizzes</h2>
-                        <p className="text-purple-100 dark:text-purple-200">Create engaging quizzes for your music lessons</p>
+                        <p className="text-purple-200">Create engaging quizzes for your music lessons</p>
                     </div>
 
                     {/* Main Content with Scroll */}
                     <div className="flex-1 overflow-y-auto p-6">
                         <form onSubmit={handleSubmit} className="space-y-6" encType="multipart/form-data">
                             {/* Configuration Section */}
-                            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
-                                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Quiz Configuration</h3>
+                            <div className="bg-gray-700 p-4 rounded-lg border border-gray-600">
+                                <h3 className="text-lg font-semibold text-gray-200 mb-4">Quiz Configuration</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        <label className="block text-sm font-medium text-gray-300 mb-2">
                                             Select Day
                                         </label>
                                         <select
                                             value={day}
                                             onChange={(e) => setDay(e.target.value)}
-                                            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                                            className="w-full p-3 border border-gray-600 rounded-lg bg-gray-800 text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
                                             required
                                         >
                                             <option value="" disabled>Select a day</option>
@@ -153,13 +158,13 @@ export default function AddQuiz() {
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        <label className="block text-sm font-medium text-gray-300 mb-2">
                                             Select Instrument
                                         </label>
                                         <select
                                             value={instrument}
                                             onChange={(e) => setInstrument(e.target.value)}
-                                            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                                            className="w-full p-3 border border-gray-600 rounded-lg bg-gray-800 text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
                                             required
                                         >
                                             <option value="guitar">🎸 Guitar</option>
@@ -171,11 +176,11 @@ export default function AddQuiz() {
                             </div>
 
                             {/* Optional: Supporting Documents Section */}
-                            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-                                <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-2">
+                            <div className="bg-blue-900/20 p-4 rounded-lg border border-blue-800">
+                                <h3 className="text-lg font-semibold text-blue-200 mb-2">
                                     📄 Additional Resources (Optional)
                                 </h3>
-                                <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
+                                <p className="text-sm text-blue-300 mb-3">
                                     Upload lesson materials, answer explanations, or reference documents that complement your quiz
                                 </p>
                                 <input
@@ -183,10 +188,10 @@ export default function AddQuiz() {
                                     accept=".docx,.pdf,.doc"
                                     multiple
                                     onChange={handleDocxFileChange}
-                                    className="w-full p-3 border border-blue-300 dark:border-blue-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-200"
+                                    className="w-full p-3 border border-blue-600 rounded-lg bg-gray-800 text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-900 file:text-blue-200 hover:file:bg-blue-800"
                                 />
                                 {docxFiles.length > 0 && (
-                                    <div className="mt-2 text-sm text-blue-600 dark:text-blue-400">
+                                    <div className="mt-2 text-sm text-blue-400">
                                         ✓ {docxFiles.length} resource file(s) selected
                                     </div>
                                 )}
@@ -195,38 +200,38 @@ export default function AddQuiz() {
                             {/* Quizzes Section */}
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
-                                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                                    <h3 className="text-lg font-semibold text-gray-200">
                                         Quiz Questions ({quizzes.length}/5)
                                     </h3>
                                     <button
                                         type="button"
                                         onClick={addQuiz}
                                         disabled={quizzes.length >= 5}
-                                        className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-md hover:shadow-lg"
+                                        className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-md hover:shadow-lg"
                                     >
                                         + Add Quiz
                                     </button>
                                 </div>
 
                                 {quizzes.length === 0 && (
-                                    <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                                    <div className="text-center py-12 text-gray-400">
                                         <div className="text-6xl mb-4">🎯</div>
                                         <p className="text-lg">No quizzes added yet. Click "Add Quiz" to get started!</p>
                                     </div>
                                 )}
 
                                 {quizzes.map((quiz, index) => (
-                                    <div key={index} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                                    <div key={index} className="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
                                         <div className="flex items-center justify-between mb-4">
-                                            <h4 className="text-xl font-semibold text-gray-800 dark:text-gray-200 flex items-center">
-                                                <span className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-3 py-1 rounded-full text-sm font-medium mr-3">
+                                            <h4 className="text-xl font-semibold text-gray-200 flex items-center">
+                                                <span className="bg-purple-900 text-purple-200 px-3 py-1 rounded-full text-sm font-medium mr-3">
                                                     Quiz {index + 1}
                                                 </span>
                                             </h4>
                                             <button
                                                 type="button"
                                                 onClick={() => removeQuiz(index)}
-                                                className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                                className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-900/20 transition-colors"
                                                 title="Remove this quiz"
                                             >
                                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,7 +242,7 @@ export default function AddQuiz() {
 
                                         <div className="space-y-4">
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                <label className="block text-sm font-medium text-gray-300 mb-2">
                                                     Question
                                                 </label>
                                                 <input
@@ -245,44 +250,44 @@ export default function AddQuiz() {
                                                     name="question"
                                                     value={quiz.question}
                                                     onChange={(e) => handleChange(index, e)}
-                                                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                                                    className="w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
                                                     placeholder="Enter your quiz question here..."
                                                     required
                                                 />
                                             </div>
 
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                <label className="block text-sm font-medium text-gray-300 mb-2">
                                                     Chord Diagram (Optional)
                                                 </label>
                                                 <input
                                                     type="file"
                                                     accept="image/*"
                                                     onChange={(e) => handleDiagramChange(index, e)}
-                                                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 dark:file:bg-purple-900 dark:file:text-purple-200"
+                                                    className="w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-purple-900 file:text-purple-200 hover:file:bg-purple-800"
                                                 />
                                                 {quiz.chordDiagram && (
-                                                    <div className="mt-2 text-sm text-green-600 dark:text-green-400">
+                                                    <div className="mt-2 text-sm text-green-400">
                                                         ✓ Image uploaded
                                                     </div>
                                                 )}
                                             </div>
 
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                                <label className="block text-sm font-medium text-gray-300 mb-3">
                                                     Answer Options
                                                 </label>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                     {quiz.options.map((option, optionIndex) => (
                                                         <div key={optionIndex} className="flex items-center space-x-2">
-                                                            <span className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-2 rounded-lg text-sm font-medium min-w-[60px] text-center">
+                                                            <span className="bg-gray-700 text-gray-300 px-3 py-2 rounded-lg text-sm font-medium min-w-[60px] text-center">
                                                                 {String.fromCharCode(65 + optionIndex)}
                                                             </span>
                                                             <input
                                                                 type="text"
                                                                 value={option}
                                                                 onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
-                                                                className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                                                                className="flex-1 p-2 border border-gray-600 rounded-lg bg-gray-700 text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
                                                                 placeholder={`Option ${optionIndex + 1}`}
                                                                 required
                                                             />
@@ -292,7 +297,7 @@ export default function AddQuiz() {
                                             </div>
 
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                <label className="block text-sm font-medium text-gray-300 mb-2">
                                                     Correct Answer
                                                 </label>
                                                 <input
@@ -300,7 +305,7 @@ export default function AddQuiz() {
                                                     name="correctAnswer"
                                                     value={quiz.correctAnswer}
                                                     onChange={(e) => handleChange(index, e)}
-                                                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                                                    className="w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
                                                     placeholder="Enter the correct answer"
                                                     required
                                                 />
@@ -312,11 +317,11 @@ export default function AddQuiz() {
 
                             {/* Submit Button */}
                             {quizzes.length > 0 && (
-                                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <div className="pt-4 border-t border-gray-700">
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-6 py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:scale-100 disabled:cursor-not-allowed transition-all duration-200"
+                                        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-gray-600 disabled:to-gray-700 text-white px-6 py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:scale-100 disabled:cursor-not-allowed transition-all duration-200"
                                     >
                                         {isSubmitting ? (
                                             <span className="flex items-center justify-center">
