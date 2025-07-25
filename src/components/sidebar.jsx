@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logoImage from "../assets/images/logo.png";
+import Cookies from 'js-cookie'; // Import js-cookie library
 
 const Sidebar = () => {
     const navigate = useNavigate();
@@ -12,7 +13,15 @@ const Sidebar = () => {
         return savedState ? JSON.parse(savedState) : false;
     });
     const [isMobile, setIsMobile] = useState(false);
-    const isAdmin = localStorage.getItem("role") === "admin";
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+        // Check both cookie and localStorage for admin role
+        const roleCookie = Cookies.get('userRole');
+        const localRole = localStorage.getItem("role");
+        
+        setIsAdmin(roleCookie === "admin" || localRole === "admin");
+    }, []);
 
     useEffect(() => {
         localStorage.setItem('sidebarCollapsed', JSON.stringify(isCollapsed));
@@ -39,17 +48,28 @@ const Sidebar = () => {
 
     const handleConfirmLogout = async () => {
         try {
+            // Server-side logout request with credentials option for cookies
             await fetch("https://localhost:3000/api/auth/logout", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
+                credentials: 'include', // Important for cookie operations
             });
 
+            // Clear localStorage
             localStorage.removeItem("token");
             localStorage.removeItem("role");
             localStorage.removeItem('sidebarCollapsed');
+            
+            // Explicitly clear cookies using js-cookie library
+            Cookies.remove('authToken', { path: '/' });
+            Cookies.remove('userRole', { path: '/' });
+            
+            // Alternative approach to clear cookies if js-cookie doesn't work
+            document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "userRole=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
             toast.success('Logged out successfully', {
                 position: "top-right",
