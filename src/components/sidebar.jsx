@@ -3,31 +3,21 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logoImage from "../assets/images/logo.png";
-import Cookies from 'js-cookie'; // Import js-cookie library
+import Cookies from 'js-cookie';
 
 const Sidebar = () => {
     const navigate = useNavigate();
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-    const [isCollapsed, setIsCollapsed] = useState(() => {
-        const savedState = localStorage.getItem('sidebarCollapsed');
-        return savedState ? JSON.parse(savedState) : false;
-    });
+    const [isCollapsed, setIsCollapsed] = useState(false); // No localStorage
     const [isMobile, setIsMobile] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
-        // Check both cookie and localStorage for admin role
+        // Use only cookies for admin role
         const roleCookie = Cookies.get('userRole');
-        const localRole = localStorage.getItem("role");
-        
-        setIsAdmin(roleCookie === "admin" || localRole === "admin");
+        setIsAdmin(roleCookie === "admin");
     }, []);
 
-    useEffect(() => {
-        localStorage.setItem('sidebarCollapsed', JSON.stringify(isCollapsed));
-    }, [isCollapsed]);
-
-    // Handle mobile responsiveness
     useEffect(() => {
         const handleResize = () => {
             const mobile = window.innerWidth < 768;
@@ -36,7 +26,6 @@ const Sidebar = () => {
                 setIsCollapsed(true);
             }
         };
-
         handleResize();
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
@@ -48,26 +37,18 @@ const Sidebar = () => {
 
     const handleConfirmLogout = async () => {
         try {
-            // Server-side logout request with credentials option for cookies
+            // Server-side logout request with credentials for cookies
             await fetch("https://localhost:3000/api/auth/logout", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
-                credentials: 'include', // Important for cookie operations
+                credentials: 'include',
             });
 
-            // Clear localStorage
-            localStorage.removeItem("token");
-            localStorage.removeItem("role");
-            localStorage.removeItem('sidebarCollapsed');
-            
-            // Explicitly clear cookies using js-cookie library
+            // Only clear cookies
             Cookies.remove('authToken', { path: '/' });
             Cookies.remove('userRole', { path: '/' });
-            
-            // Alternative approach to clear cookies if js-cookie doesn't work
             document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             document.cookie = "userRole=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
@@ -97,18 +78,28 @@ const Sidebar = () => {
     };
 
     const handleAdminDashboardClick = () => {
-        toast.success('You are in AdminDashboard.', {
-            position: "top-right",
-            autoClose: 1500,
-        });
-        navigate("/admindash");
+        // Check for admin cookie before redirect
+        const roleCookie = Cookies.get('userRole');
+        if (roleCookie === "admin") {
+            toast.success('You are in AdminDashboard.', {
+                position: "top-right",
+                autoClose: 1500,
+            });
+            navigate("/admindash");
+        } else {
+            toast.error('You are not authorized.', {
+                position: "top-right",
+                autoClose: 2500,
+            });
+            navigate("/login");
+        }
     };
 
     const toggleSidebar = () => {
         setIsCollapsed(!isCollapsed);
     };
 
-    // Fancy custom SVG icons
+    // SVG Icons
     const HomeIcon = () => (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -171,12 +162,6 @@ const Sidebar = () => {
         </svg>
     );
 
-    const MenuOpenIcon = () => (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-    );
-
     return (
         <div className="min-h-screen flex">
             <aside className={`bg-gray-800/90 backdrop-blur-xl shadow-2xl rounded-3xl relative transition-all duration-300 border border-gray-700/50 flex flex-col ${
@@ -184,7 +169,6 @@ const Sidebar = () => {
                     ? 'w-20 ml-2 mt-2 mb-2' 
                     : 'w-72 ml-4 mt-6 mb-7'
             } ${isMobile ? 'fixed z-50 h-screen' : ''}`}>
-                
                 {/* Toggle Button */}
                 <div className="p-4 flex-shrink-0">
                     <div className="flex justify-start mb-2">
@@ -198,7 +182,6 @@ const Sidebar = () => {
                         </div>
                     </button>
                     </div>
-                    
                     {/* Logo */}
                     <div className="flex justify-center">
                         <Link to="/dashboard" className="group">
@@ -214,7 +197,6 @@ const Sidebar = () => {
                         </Link>
                     </div>
                 </div>
-
                 {/* Navigation - Scrollable */}
                 <nav className="flex-1 px-2 overflow-y-auto scrollbar-hide">
                     <ul className="space-y-1 pb-4">
@@ -229,7 +211,6 @@ const Sidebar = () => {
                                 {!isCollapsed && <span className="ml-3 font-medium text-sm">Home</span>}
                             </Link>
                         </li>
-                        
                         <li>
                             <Link
                                 to="/lesson"
@@ -241,7 +222,6 @@ const Sidebar = () => {
                                 {!isCollapsed && <span className="ml-3 font-medium text-sm">Lessons</span>}
                             </Link>
                         </li>
-                        
                         <li>
                             <Link
                                 to="/practiceSessions"
@@ -253,7 +233,6 @@ const Sidebar = () => {
                                 {!isCollapsed && <span className="ml-3 font-medium text-sm">Practice Sessions</span>}
                             </Link>
                         </li>
-                        
                         <li>
                             <Link
                                 to="/chords"
@@ -265,7 +244,6 @@ const Sidebar = () => {
                                 {!isCollapsed && <span className="ml-3 font-medium text-sm">Chords & Lyrics</span>}
                             </Link>
                         </li>
-                        
                         <li>
                             <Link
                                 to="/tuner"
@@ -277,7 +255,6 @@ const Sidebar = () => {
                                 {!isCollapsed && <span className="ml-3 font-medium text-sm">Tuner</span>}
                             </Link>
                         </li>
-                        
                         <li>
                             <Link
                                 to="/liked-songs"
@@ -289,7 +266,6 @@ const Sidebar = () => {
                                 {!isCollapsed && <span className="ml-3 font-medium text-sm">Liked Songs</span>}
                             </Link>
                         </li>
-                        
                         <li>
                             <button
                                 onClick={handleSupportUsClick}
@@ -301,7 +277,6 @@ const Sidebar = () => {
                                 {!isCollapsed && <span className="ml-3 font-medium text-sm">Support Us</span>}
                             </button>
                         </li>
-                        
                         {isAdmin && (
                             <li>
                                 <button
@@ -317,7 +292,6 @@ const Sidebar = () => {
                         )}
                     </ul>
                 </nav>
-
                 {/* Logout Button - Fixed at bottom with more space */}
                 <div className="flex-shrink-0 p-4 border-t border-gray-700/50">
                     <button
@@ -331,7 +305,6 @@ const Sidebar = () => {
                     </button>
                 </div>
             </aside>
-
             {/* Mobile Overlay */}
             {isMobile && !isCollapsed && (
                 <div 
@@ -339,7 +312,6 @@ const Sidebar = () => {
                     onClick={toggleSidebar}
                 />
             )}
-
             {/* Enhanced Logout Confirmation Modal */}
             {showLogoutConfirm && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
@@ -372,7 +344,6 @@ const Sidebar = () => {
                     </div>
                 </div>
             )}
-
             {/* Custom scrollbar styles */}
             <style jsx>{`
                 .scrollbar-hide {
