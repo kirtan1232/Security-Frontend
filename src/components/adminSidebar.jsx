@@ -5,20 +5,13 @@ import "react-toastify/dist/ReactToastify.css";
 import logoImage from "../assets/images/logo.png";
 import { faClipboardList } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Cookies from 'js-cookie'; // Import js-cookie library
+import Cookies from 'js-cookie';
 
 const AdminSidebar = () => {
     const navigate = useNavigate();
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-    const [isCollapsed, setIsCollapsed] = useState(() => {
-        const savedState = localStorage.getItem('adminSidebarCollapsed');
-        return savedState ? JSON.parse(savedState) : false;
-    });
+    const [isCollapsed, setIsCollapsed] = useState(false); // No localStorage
     const [isMobile, setIsMobile] = useState(false);
-
-    useEffect(() => {
-        localStorage.setItem('adminSidebarCollapsed', JSON.stringify(isCollapsed));
-    }, [isCollapsed]);
 
     // Handle mobile responsiveness
     useEffect(() => {
@@ -45,22 +38,14 @@ const AdminSidebar = () => {
             await fetch("https://localhost:3000/api/auth/logout", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json"
                 },
-                credentials: 'include', // Important for cookie operations
+                credentials: 'include',
             });
 
-            // Clear localStorage
-            localStorage.removeItem("token");
-            localStorage.removeItem("role");
-            localStorage.removeItem('adminSidebarCollapsed');
-            
             // Explicitly clear cookies using js-cookie library
             Cookies.remove('authToken', { path: '/' });
             Cookies.remove('userRole', { path: '/' });
-            
-            // Alternative approach to clear cookies if js-cookie doesn't work
             document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             document.cookie = "userRole=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
