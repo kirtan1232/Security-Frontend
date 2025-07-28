@@ -26,57 +26,35 @@ import Success from "./components/success.jsx";
 import Payment from "./core/public/payment.jsx";
 import OtpPage from "./core/public/otp.jsx";
 import AuditLog from "./core/private/auditlog.jsx";
-import './i18n.js'; // Import i18n for translations
 import axios from 'axios';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  // Function to check both cookies and localStorage
+  // Check authentication status on mount
   const checkAuth = async () => {
-    // First check cookies via API endpoint
     try {
       const response = await axios.get('https://localhost:3000/api/auth/check-auth', {
-        withCredentials: true  // Important to include credentials for cookies
+        withCredentials: true
       });
-      
-      if (response.data.isAuthenticated) {
-        setIsAuthenticated(true);
-        setIsAdmin(response.data.role === "admin");
-        // Sync localStorage with cookie for backward compatibility
-        localStorage.setItem("token", "cookie-synced-token"); // Dummy token
-        localStorage.setItem("role", response.data.role);
-        return;
-      }
+      setIsAuthenticated(!!response.data.isAuthenticated);
+      setIsAdmin(response.data.role === "admin");
     } catch (error) {
-      console.log("Cookie auth check failed, falling back to localStorage");
+      setIsAuthenticated(false);
+      setIsAdmin(false);
     }
-    
-    // Fallback to localStorage if cookie check fails
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
-    setIsAuthenticated(!!token);
-    setIsAdmin(role === "admin");
-    setIsCheckingAuth(false);
   };
 
   useEffect(() => {
     checkAuth();
     window.addEventListener("storage", checkAuth);
     return () => window.removeEventListener("storage", checkAuth);
+    // eslint-disable-next-line
   }, []);
 
-  // Show loading while checking authentication
-  if (isCheckingAuth) {
-    return <div className="flex items-center justify-center h-screen bg-gray-900">
-      <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-600"></div>
-    </div>;
-  }
-
   const publicRoutes = [
-    { path: "/", element: <Navigate to="/login" replace /> }, // Redirect root to /login
+    { path: "/", element: <Navigate to="/login" replace /> },
     {
       path: "/login",
       element: (
