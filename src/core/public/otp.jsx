@@ -40,8 +40,19 @@ const OtpPage = () => {
         }
         setLoading(true);
         try {
+            // Fetch fresh CSRF token before POST
+            const csrfRes = await axios.get(`${API_URL}/csrf-token`, { withCredentials: true });
+            const csrfToken = csrfRes.data.csrfToken;
+
             const code = otp.join("");
-            const res = await axios.post(`${API_URL}/auth/verify-otp`, { userId, otp: code });
+            await axios.post(
+                `${API_URL}/auth/verify-otp`,
+                { userId, otp: code },
+                {
+                    withCredentials: true,
+                    headers: { "X-CSRF-Token": csrfToken }
+                }
+            );
             toast.success("Email verified!");
             // Optionally: auto-login after verification, or redirect to login
             setTimeout(() => navigate("/login"), 1500);

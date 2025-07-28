@@ -16,6 +16,13 @@ export default function Lesson() {
   const [hoveredDay, setHoveredDay] = useState(null);
   const [showCelebration, setShowCelebration] = useState(false);
 
+  // CSRF helper (for future mutating requests if needed)
+  async function getFreshCsrfToken() {
+    const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
+    const { csrfToken } = await res.json();
+    return csrfToken;
+  }
+
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
@@ -41,8 +48,8 @@ export default function Lesson() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
+          credentials: "include" // <--- Use only cookies for auth!
         });
 
         if (!response.ok) {
@@ -65,8 +72,8 @@ export default function Lesson() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
+          credentials: "include" // <--- Use only cookies for auth!
         });
 
         if (!response.ok) {

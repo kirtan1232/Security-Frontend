@@ -50,14 +50,24 @@ const RegisterPage = () => {
         }
         setLoading(true);
         try {
-            const response = await axios.post(`${API_URL}/auth/register`, {
-                name,
-                email,
-                password,
-                role: "user",
-            });
+            // Always fetch a fresh CSRF token before registration
+            const csrfRes = await axios.get(`${API_URL}/csrf-token`, { withCredentials: true });
+            const csrfToken = csrfRes.data.csrfToken;
+
+            const response = await axios.post(
+                `${API_URL}/auth/register`,
+                {
+                    name,
+                    email,
+                    password,
+                    role: "user",
+                },
+                {
+                    withCredentials: true,
+                    headers: { "X-CSRF-Token": csrfToken }
+                }
+            );
             if (response.status === 201) {
-                // Backend should return: { message: 'User registered successfully. Please check your email for OTP.', userId: ... }
                 toast.success("Account created! Please check your email for a 6-digit OTP to verify your email.");
                 navigate("/otp", { state: { userId: response.data.userId, email: email } });
             }

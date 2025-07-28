@@ -44,6 +44,13 @@ const ResetPasswordPage = () => {
         }
     }, []);
 
+    // CSRF helper for POST
+    async function getFreshCsrfToken() {
+        const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
+        const { csrfToken } = await res.json();
+        return csrfToken;
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -68,15 +75,22 @@ const ResetPasswordPage = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post('https://localhost:3000/api/auth/reset-password', {
-                token,
-                newPassword,
-            });
+            const csrfToken = await getFreshCsrfToken();
+            const response = await axios.post(
+                'https://localhost:3000/api/auth/reset-password',
+                { token, newPassword },
+                {
+                    headers: {
+                        "X-CSRF-Token": csrfToken
+                    },
+                    withCredentials: true
+                }
+            );
             toast.success(response.data.msg, {
                 position: "top-right",
                 autoClose: 1500,
             });
-            navigate("/login");
+            navigate("/dashboard");
         } catch (error) {
             const errorMsg = error.response?.data?.msg || "Something went wrong. Please try again.";
             toast.error(errorMsg, {

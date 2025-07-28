@@ -31,6 +31,7 @@ export default function LessonDetails() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
+          credentials: "include"
         });
 
         if (!response.ok) {
@@ -59,8 +60,6 @@ export default function LessonDetails() {
           throw new Error("Failed to fetch quizzes");
         }
         const data = await response.json();
-        console.log("Fetched quiz data:", data);
-
         if (data.length > 0) {
           const allQuizzes = data.flatMap((quiz) => quiz.quizzes);
           setQuizzes(allQuizzes);
@@ -138,6 +137,13 @@ export default function LessonDetails() {
     setShowFeedback(false);
   };
 
+  // Fetch a fresh CSRF token for POST
+  async function getFreshCsrfToken() {
+    const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
+    const { csrfToken } = await res.json();
+    return csrfToken;
+  }
+
   const handleSubmit = async () => {
     const hasIncorrectAnswers = selectedAnswers.some((answer) => answer && !answer.correct);
     if (hasIncorrectAnswers || selectedAnswers.length < quizzes.length) {
@@ -149,13 +155,16 @@ export default function LessonDetails() {
     }
 
     try {
+      const csrfToken = await getFreshCsrfToken();
       const response = await fetch("https://localhost:3000/api/completed/addcompleted", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "X-CSRF-Token": csrfToken
         },
         body: JSON.stringify({ day, instrument }),
+        credentials: "include"
       });
 
       if (!response.ok) {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaCoffee, FaHeart, FaMusic, FaGuitar } from "react-icons/fa"; // For the coffee cup icon
+import { FaCoffee, FaHeart, FaMusic, FaGuitar } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,7 +12,7 @@ const SupportPayment = () => {
   const [userProfile, setUserProfile] = useState(null);
   const [nameOrSocial, setNameOrSocial] = useState("");
   const [message, setMessage] = useState("");
-  const [amount, setAmount] = useState(10); // Changed default amount to 10
+  const [amount, setAmount] = useState(10);
 
   // Fetch user profile
   useEffect(() => {
@@ -24,6 +24,7 @@ const SupportPayment = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
+          credentials: "include"
         });
 
         if (!response.ok) {
@@ -61,6 +62,13 @@ const SupportPayment = () => {
     }
   }, [location, navigate]);
 
+  // Fetch a fresh CSRF token
+  async function getFreshCsrfToken() {
+    const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
+    const { csrfToken } = await res.json();
+    return csrfToken;
+  }
+
   const handleDonationSubmit = async (e) => {
     e.preventDefault();
     if (!nameOrSocial.trim()) {
@@ -81,10 +89,13 @@ const SupportPayment = () => {
     localStorage.setItem("pendingDonation", JSON.stringify(donationData));
 
     try {
+      const csrfToken = await getFreshCsrfToken();
+
       const response = await fetch(`https://localhost:3000/api/esewa/donate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-CSRF-Token": csrfToken
         },
         body: JSON.stringify({
           amount,
@@ -93,6 +104,7 @@ const SupportPayment = () => {
           success_url: `https://localhost:3000/api/esewa/success?redirect=/success`,
           failure_url: `https://localhost:3000/api/esewa/failure?redirect=/payment?payment=failure`,
         }),
+        credentials: "include"
       });
       const data = await response.json();
       if (data.message === "Donation Order Created Successfully") {
@@ -234,7 +246,7 @@ const SupportPayment = () => {
                       </h2>
                     </div>
                     
-                    {/* Amount Selection with enhanced styling */}
+                    {/* Amount Selection */}
                     <div className="mb-6">
                       <div className="flex items-center justify-center mb-4">
                         <FaCoffee className="text-2xl text-amber-400 mr-2" />

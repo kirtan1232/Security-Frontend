@@ -25,22 +25,22 @@ export default function Profile() {
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
 
-    // Fetch user profile
+    // Fetch user profile with cookies
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const token = localStorage.getItem("token");
-                if (!token) {
-                    navigate("/login");
-                    return;
-                }
                 const response = await fetch("https://localhost:3000/api/auth/profile", {
                     method: "GET",
                     headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json"
                     },
+                    credentials: "include"
                 });
+
+                if (response.status === 401 || response.status === 403) {
+                    navigate("/login");
+                    return;
+                }
 
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -111,9 +111,14 @@ export default function Profile() {
             return;
         }
 
-        const token = localStorage.getItem("token");
-        if (!token) {
-            navigate("/login");
+        // Fetch a fresh CSRF token before the update
+        let freshCsrfToken = "";
+        try {
+            const csrfRes = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
+            const csrfData = await csrfRes.json();
+            freshCsrfToken = csrfData.csrfToken;
+        } catch {
+            toast.error("Failed to get CSRF token. Try again.");
             return;
         }
 
@@ -124,9 +129,17 @@ export default function Profile() {
         try {
             const response = await fetch("https://localhost:3000/api/auth/update-profile", {
                 method: "PUT",
-                headers: { Authorization: `Bearer ${token}` },
+                headers: {
+                    "X-CSRF-Token": freshCsrfToken
+                },
                 body: formData,
+                credentials: "include"
             });
+
+            if (response.status === 401 || response.status === 403) {
+                navigate("/login");
+                return;
+            }
 
             if (!response.ok) {
                 const errorData = await response.json();
@@ -157,9 +170,14 @@ export default function Profile() {
             return;
         }
 
-        const token = localStorage.getItem("token");
-        if (!token) {
-            navigate("/login");
+        // Fetch a fresh CSRF token before the update
+        let freshCsrfToken = "";
+        try {
+            const csrfRes = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
+            const csrfData = await csrfRes.json();
+            freshCsrfToken = csrfData.csrfToken;
+        } catch {
+            toast.error("Failed to get CSRF token. Try again.");
             return;
         }
 
@@ -172,9 +190,17 @@ export default function Profile() {
         try {
             const response = await fetch("https://localhost:3000/api/auth/update-profile", {
                 method: "PUT",
-                headers: { Authorization: `Bearer ${token}` },
+                headers: {
+                    "X-CSRF-Token": freshCsrfToken
+                },
                 body: formData,
+                credentials: "include"
             });
+
+            if (response.status === 401 || response.status === 403) {
+                navigate("/login");
+                return;
+            }
 
             if (!response.ok) {
                 const errorData = await response.json();

@@ -12,6 +12,7 @@ export default function LikedSongs() {
     const [userProfile, setUserProfile] = useState(null);
     const navigate = useNavigate();
 
+    // Fetch liked songs (GET)
     const fetchLikedSongs = async () => {
         try {
             const response = await fetch("https://localhost:3000/api/favorites/getfav", {
@@ -20,6 +21,7 @@ export default function LikedSongs() {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
+                credentials: "include"
             });
 
             if (!response.ok) {
@@ -43,6 +45,7 @@ export default function LikedSongs() {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
+                    credentials: "include"
                 });
 
                 if (!response.ok) {
@@ -63,18 +66,25 @@ export default function LikedSongs() {
         fetchLikedSongs();
     }, []);
 
+    // Unlike a song (POST - needs CSRF)
     const handleUnlikeSong = async (songId) => {
         try {
-            console.log('Unliking songId:', songId, 'Type:', typeof songId);
+            // Optimistic update: remove locally
             setLikedSongs(prev => prev.filter(song => song._id.toString() !== songId));
+
+            // Fetch a fresh CSRF token
+            const csrfRes = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
+            const { csrfToken } = await csrfRes.json();
 
             const response = await fetch(`https://localhost:3000/api/favorites/songs`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "X-CSRF-Token": csrfToken
                 },
                 body: JSON.stringify({ songId }),
+                credentials: "include"
             });
 
             if (!response.ok) {

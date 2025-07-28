@@ -26,6 +26,13 @@ const ForgetPassword = () => {
         }));
     }, []); // Empty dependency array means this only runs once
 
+    // CSRF helper
+    async function getFreshCsrfToken() {
+        const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
+        const { csrfToken } = await res.json();
+        return csrfToken;
+    }
+
     const handleForgotPassword = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -40,12 +47,22 @@ const ForgetPassword = () => {
         }
 
         try {
-            const response = await axios.post('https://localhost:3000/api/auth/forgotPassword', { email });
+            const csrfToken = await getFreshCsrfToken();
+            const response = await axios.post(
+                'https://localhost:3000/api/auth/forgotPassword',
+                { email },
+                {
+                    headers: {
+                        "X-CSRF-Token": csrfToken
+                    },
+                    withCredentials: true
+                }
+            );
             toast.success(response.data.msg, {
                 position: "top-right",
                 autoClose: 1500,
             });
-            navigate("/login");
+            navigate("/login"); // <-- Ensure this is /login, not /dashboard
         } catch (error) {
             console.error('Error:', error);
             const errorMsg = error.response?.data?.msg;

@@ -15,6 +15,13 @@ export default function PracticeSession() {
   const [hoveredDay, setHoveredDay] = useState(null);
   const [showCelebration, setShowCelebration] = useState(false);
 
+  // CSRF helper
+  async function getFreshCsrfToken() {
+    const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
+    const { csrfToken } = await res.json();
+    return csrfToken;
+  }
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -24,6 +31,7 @@ export default function PracticeSession() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
+          credentials: "include"
         });
 
         if (!response.ok) {
@@ -64,6 +72,7 @@ export default function PracticeSession() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
+          credentials: "include"
         });
         if (!response.ok) {
           throw new Error("Failed to fetch completed sessions");
