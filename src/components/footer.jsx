@@ -3,10 +3,10 @@ import logoImage from '../assets/images/logo.png';
 import { useTranslation } from 'react-i18next';
 
 const Footer = () => {
-  const { t, i18n } = useTranslation();
+ 
 
   return (
-    <footer className={`bg-gray-800/80 backdrop-blur-xl rounded-lg shadow-xl border border-gray-700/50 m-4 relative ${i18n.language === 'ne' ? 'font-noto-sans' : ''}`}>
+    <footer className="bg-gray-800/80 backdrop-blur-xl rounded-lg shadow-xl border border-gray-700/50 m-4 relative">
       {/* Big logo positioned at left center */}
       <div className="absolute left-8 top-1/2 transform -translate-y-1/2">
         <a href="https://flowbite.com/" className="flex items-center">
@@ -35,23 +35,23 @@ const Footer = () => {
           </div>
           <ul className="flex flex-wrap items-center mb-6 text-lg font-medium text-gray-300 sm:mb-0">
             <li>
-              <a href="#" className="hover:text-purple-400 transition-colors duration-300 me-4 md:me-6">{t('About')}</a>
+              <a href="#" className="hover:text-purple-400 transition-colors duration-300 me-4 md:me-6">{('About')}</a>
             </li>
             <li>
-              <a href="#" className="hover:text-purple-400 transition-colors duration-300 me-4 md:me-6">{t('Privacy Policy')}</a>
+              <a href="#" className="hover:text-purple-400 transition-colors duration-300 me-4 md:me-6">{('Privacy Policy')}</a>
             </li>
             <li>
-              <a href="#" className="hover:text-purple-400 transition-colors duration-300 me-4 md:me-6">{t('Licensing')}</a>
+              <a href="#" className="hover:text-purple-400 transition-colors duration-300 me-4 md:me-6">{('Licensing')}</a>
             </li>
             <li>
-              <a href="#" className="hover:text-purple-400 transition-colors duration-300">{t('Contact')}</a>
+              <a href="#" className="hover:text-purple-400 transition-colors duration-300">{('Contact')}</a>
             </li>
           </ul>
         </div>
         
         <hr className="my-6 border-gray-700 sm:mx-auto lg:my-8" />
         <span className="block text-sm text-gray-400 sm:text-center">
-          {t('© 2025 Soundwise™. All Rights Reserved.')}<br />{t('Kirtan Shrestha')}
+          {('© 2025 Soundwise™. All Rights Reserved.')}<br />{('Kirtan Shrestha')}
         </span>
       </div>
     </footer>
