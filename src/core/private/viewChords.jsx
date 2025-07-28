@@ -18,14 +18,22 @@ const ViewChords = () => {
         fetchSongs();
     }, []);
 
+    // CSRF helper (if needed for song edit/delete)
+    async function getFreshCsrfToken() {
+        const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
+        const { csrfToken } = await res.json();
+        return csrfToken;
+    }
+
+    // Fetch songs using cookie-based authentication (no localStorage, no Authorization header)
     const fetchSongs = async () => {
         setLoading(true);
         try {
-            const token = localStorage.getItem('token');
             const response = await axios.get('https://localhost:3000/api/songs/getsongs', {
-                headers: { Authorization: `Bearer ${token}` },
+                withCredentials: true
             });
             setSongs(Array.isArray(response.data.songs) ? response.data.songs : []);
+            setError(null);
         } catch (err) {
             setError(err.response?.data?.message || 'Error fetching songs');
         } finally {
@@ -52,12 +60,7 @@ const ViewChords = () => {
     };
 
     const handleEditSubmit = async (e) => {
-        e.preventDefault();
-        const token = localStorage.getItem('token');
-        if (!token) {
-            alert("No authentication token found. Please log in.");
-            return;
-        }
+        if (e) e.preventDefault();
         if (!editFormData.songName || !editFormData.selectedInstrument) {
             alert("Song name and instrument are required.");
             return;
@@ -71,12 +74,18 @@ const ViewChords = () => {
         });
 
         try {
-            const response = await axios.put(`https://localhost:3000/api/songs/${editSong._id}`, formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    Authorization: `Bearer ${token}`
+            const csrfToken = await getFreshCsrfToken();
+            await axios.put(
+                `https://localhost:3000/api/songs/${editSong._id}`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        "X-CSRF-Token": csrfToken
+                    },
+                    withCredentials: true
                 }
-            });
+            );
             alert("Song updated successfully!");
             setEditSong(null);
             fetchSongs();
@@ -87,19 +96,21 @@ const ViewChords = () => {
 
     const handleDelete = async (songId) => {
         if (window.confirm("Are you sure you want to delete this song?")) {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                alert("No authentication token found. Please log in.");
-                return;
-            }
             if (!songId.match(/^[0-9a-fA-F]{24}$/)) {
                 alert("Invalid song ID format.");
                 return;
             }
             try {
-                const response = await axios.delete(`https://localhost:3000/api/songs/${songId}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const csrfToken = await getFreshCsrfToken();
+                await axios.delete(
+                    `https://localhost:3000/api/songs/${songId}`,
+                    {
+                        headers: {
+                            "X-CSRF-Token": csrfToken
+                        },
+                        withCredentials: true
+                    }
+                );
                 alert("Song deleted successfully!");
                 fetchSongs();
             } catch (err) {
@@ -128,7 +139,6 @@ const ViewChords = () => {
                     {/* Header */}
                     <div className="p-6 border-b border-gray-700 flex-shrink-0">
                         <h2 className="text-2xl font-bold mb-4 text-gray-200">View Chords</h2>
-                        
                         {/* Instrument Filter Tabs */}
                         <div className="flex flex-wrap gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
                             {uniqueInstruments.map((instrument) => (
@@ -146,7 +156,6 @@ const ViewChords = () => {
                             ))}
                         </div>
                     </div>
-                    
                     {/* Content Area */}
                     <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
                         {loading ? (
@@ -188,7 +197,6 @@ const ViewChords = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        
                                         {/* Song Content */}
                                         <div className="p-4 space-y-4">
                                             {/* Chord Diagrams */}
@@ -214,7 +222,6 @@ const ViewChords = () => {
                                                     </div>
                                                 </div>
                                             )}
-                                            
                                             {/* Lyrics */}
                                             <div>
                                                 <h4 className="font-semibold text-gray-200 mb-2">
@@ -263,7 +270,6 @@ const ViewChords = () => {
                     </div>
                 </div>
             </div>
-            
             {/* Edit Modal */}
             {editSong && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
@@ -274,7 +280,6 @@ const ViewChords = () => {
                                 Edit Song
                             </h3>
                         </div>
-                        
                         {/* Modal Content */}
                         <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
                             <form onSubmit={handleEditSubmit} className="space-y-6">
@@ -290,7 +295,6 @@ const ViewChords = () => {
                                         placeholder="Enter song title"
                                     />
                                 </div>
-                                
                                 <div>
                                     <label className="block text-gray-300 font-medium mb-2">
                                         Select Instrument
@@ -305,7 +309,6 @@ const ViewChords = () => {
                                         <option value="ukulele">Ukulele</option>
                                     </select>
                                 </div>
-                                
                                 <div>
                                     <label className="block text-gray-300 font-medium mb-2">
                                         Upload Chord Diagram(s)
@@ -318,27 +321,22 @@ const ViewChords = () => {
                                         className="w-full p-3 text-gray-300 border rounded-lg bg-gray-700 border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
                                 </div>
+                                <div className="flex justify-end gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setEditSong(null)}
+                                        className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                                    >
+                                        Save Changes
+                                    </button>
+                                </div>
                             </form>
-                        </div>
-                        
-                        {/* Modal Footer */}
-                        <div className="p-6 border-t border-gray-700 flex-shrink-0">
-                            <div className="flex justify-end gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => setEditSong(null)}
-                                    className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    onClick={handleEditSubmit}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                                >
-                                    Save Changes
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>

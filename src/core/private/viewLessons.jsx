@@ -52,9 +52,17 @@ const ViewLessons = () => {
         }
     };
 
+    // CSRF token fetch
+    async function getFreshCsrfToken() {
+        const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
+        const { csrfToken } = await res.json();
+        return csrfToken;
+    }
+
     const handleEditSubmit = async (e) => {
         e.preventDefault();
         try {
+            const csrfToken = await getFreshCsrfToken();
             const formData = new FormData();
             const quizData = {
                 day: editForm.day,
@@ -73,12 +81,18 @@ const ViewLessons = () => {
                 }
             });
 
-            const response = await axios.put(`https://localhost:3000/api/quiz/updatequiz/${editQuiz._id}`, formData, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            const response = await axios.put(
+                `https://localhost:3000/api/quiz/updatequiz/${editQuiz._id}`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'multipart/form-data',
+                        'X-CSRF-Token': csrfToken,
+                    },
+                    withCredentials: true
+                }
+            );
 
             setQuizzes(quizzes.map(q => q._id === editQuiz._id ? response.data.quiz : q));
             setEditQuiz(null);
@@ -91,9 +105,17 @@ const ViewLessons = () => {
     const handleDeleteQuiz = async (quizId) => {
         if (!window.confirm('Are you sure you want to delete this quiz?')) return;
         try {
-            await axios.delete(`https://localhost:3000/api/quiz/deletequiz/${quizId}`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-            });
+            const csrfToken = await getFreshCsrfToken();
+            await axios.delete(
+                `https://localhost:3000/api/quiz/deletequiz/${quizId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        'X-CSRF-Token': csrfToken,
+                    },
+                    withCredentials: true
+                }
+            );
             setQuizzes(quizzes.filter(q => q._id !== quizId));
             setError(null);
         } catch (err) {
@@ -122,9 +144,9 @@ const ViewLessons = () => {
             
             <AdminSidebar />
             <div className="flex justify-center items-center w-full relative z-10">
-                <div className="p-6 bg-gray-800/80 backdrop-blur-xl rounded-lg shadow-xl border border-gray-700/50 w-[65%] ml-[-5%] h-[90vh] flex flex-col">
+                <div className="p-6 bg-gray-800/80 backdrop-blur-xl rounded-lg shadow-xl border border-gray-700/50 w-full sm:w-[90%] md:w-[80%] lg:w-[65%] ml-0 md:ml-[-5%] h-[90vh] flex flex-col">
                     <h2 className="text-2xl font-bold mb-4 text-gray-200">View Lessons</h2>
-                    <div className="flex justify-start space-x-8 mb-6">
+                    <div className="flex flex-wrap gap-4 justify-start mb-6">
                         {uniqueInstruments.map((instrument) => (
                             <span
                                 key={instrument}
@@ -154,20 +176,20 @@ const ViewLessons = () => {
                                                 key={quiz._id}
                                                 className="p-4 bg-gray-700 bg-opacity-60 backdrop-blur-lg rounded-xl shadow-md mb-4"
                                             >
-                                                <div className="flex justify-between items-center mb-2">
+                                                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-2 gap-2">
                                                     <h4 className="text-lg font-semibold text-gray-200">
                                                         {quiz.instrument} Quiz {index + 1}
                                                     </h4>
-                                                    <div>
+                                                    <div className="flex gap-2 mt-2 md:mt-0">
                                                         <button
                                                             onClick={() => handleEditQuiz(quiz)}
-                                                            className="mr-2 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                                            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                                                         >
                                                             Edit
                                                         </button>
                                                         <button
                                                             onClick={() => handleDeleteQuiz(quiz._id)}
-                                                            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                                                            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
                                                         >
                                                             Delete
                                                         </button>
@@ -221,65 +243,65 @@ const ViewLessons = () => {
                 </div>
             </div>
             {editQuiz && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-gray-800 p-6 rounded-lg w-[80%] max-w-4xl border border-gray-700">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-2">
+                    <div className="bg-gray-800 p-6 rounded-lg w-full max-w-3xl border border-gray-700 shadow-2xl overflow-y-auto max-h-[95vh]">
                         <h3 className="text-xl font-bold mb-4 text-gray-200">Edit Quiz</h3>
                         <form onSubmit={handleEditSubmit}>
                             <div className="mb-4">
-                                <label className="block text-gray-300">Day</label>
+                                <label className="block text-gray-300 mb-1">Day</label>
                                 <input
                                     type="text"
                                     value={editForm.day}
                                     onChange={(e) => handleEditFormChange('day', e.target.value)}
-                                    className="w-full p-2 border rounded bg-gray-700 text-gray-300 border-gray-600"
+                                    className="w-full p-2 border rounded bg-gray-700 text-gray-300 border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-600"
                                     required
                                 />
                             </div>
                             <div className="mb-4">
-                                <label className="block text-gray-300">Instrument</label>
+                                <label className="block text-gray-300 mb-1">Instrument</label>
                                 <input
                                     type="text"
                                     value={editForm.instrument}
                                     onChange={(e) => handleEditFormChange('instrument', e.target.value)}
-                                    className="w-full p-2 border rounded bg-gray-700 text-gray-300 border-gray-600"
+                                    className="w-full p-2 border rounded bg-gray-700 text-gray-300 border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-600"
                                     required
                                 />
                             </div>
                             {editForm.quizzes.map((q, index) => (
-                                <div key={index} className="mb-4 p-4 bg-gray-700 rounded">
+                                <div key={index} className="mb-4 p-4 bg-gray-700 rounded space-y-2">
                                     <h4 className="text-lg font-semibold mb-2 text-gray-200">Question {index + 1}</h4>
                                     <div className="mb-2">
-                                        <label className="block text-gray-300">Question</label>
+                                        <label className="block text-gray-300 mb-1">Question</label>
                                         <input
                                             type="text"
                                             value={q.question}
                                             onChange={(e) => handleEditFormChange('question', e.target.value, index)}
-                                            className="w-full p-2 border rounded bg-gray-600 text-gray-300 border-gray-600"
+                                            className="w-full p-2 border rounded bg-gray-600 text-gray-300 border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-600"
                                             required
                                         />
                                     </div>
                                     <div className="mb-2">
-                                        <label className="block text-gray-300">Options (comma-separated)</label>
+                                        <label className="block text-gray-300 mb-1">Options (comma-separated)</label>
                                         <input
                                             type="text"
                                             value={q.options}
                                             onChange={(e) => handleEditFormChange('options', e.target.value, index)}
-                                            className="w-full p-2 border rounded bg-gray-600 text-gray-300 border-gray-600"
+                                            className="w-full p-2 border rounded bg-gray-600 text-gray-300 border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-600"
                                             required
                                         />
                                     </div>
                                     <div className="mb-2">
-                                        <label className="block text-gray-300">Correct Answer</label>
+                                        <label className="block text-gray-300 mb-1">Correct Answer</label>
                                         <input
                                             type="text"
                                             value={q.correctAnswer}
                                             onChange={(e) => handleEditFormChange('correctAnswer', e.target.value, index)}
-                                            className="w-full p-2 border rounded bg-gray-600 text-gray-300 border-gray-600"
+                                            className="w-full p-2 border rounded bg-gray-600 text-gray-300 border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-600"
                                             required
                                         />
                                     </div>
                                     <div className="mb-2">
-                                        <label className="block text-gray-300">Chord Diagram</label>
+                                        <label className="block text-gray-300 mb-1">Chord Diagram</label>
                                         <input
                                             type="file"
                                             accept="image/*"
@@ -289,17 +311,17 @@ const ViewLessons = () => {
                                     </div>
                                 </div>
                             ))}
-                            <div className="flex justify-end">
+                            <div className="flex flex-col sm:flex-row justify-end gap-2">
                                 <button
                                     type="button"
                                     onClick={() => setEditQuiz(null)}
-                                    className="mr-2 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                                    className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                                 >
                                     Save
                                 </button>

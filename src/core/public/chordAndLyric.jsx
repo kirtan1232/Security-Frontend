@@ -79,6 +79,7 @@ export default function ChordAndLyric() {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
+                    credentials: "include"
                 });
 
                 if (!response.ok) {
@@ -100,6 +101,7 @@ export default function ChordAndLyric() {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
+                    credentials: "include"
                 });
 
                 if (!response.ok) {
@@ -122,6 +124,13 @@ export default function ChordAndLyric() {
         fetchLikedSongs();
     }, []);
 
+    // Fetch a fresh CSRF token for mutating requests
+    async function getFreshCsrfToken() {
+        const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
+        const { csrfToken } = await res.json();
+        return csrfToken;
+    }
+
     const handleLikeSong = async (songId, e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -131,15 +140,18 @@ export default function ChordAndLyric() {
         setTimeout(() => setShowLikeAnimation(null), 1000);
 
         try {
-            console.log(`Toggling favorite for song ID: ${songId}`);
+            // Get fresh CSRF token
+            const csrfToken = await getFreshCsrfToken();
             const isLiked = likedSongs.includes(songId.toString());
             const response = await fetch(`https://localhost:3000/api/favorites/songs`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "X-CSRF-Token": csrfToken
                 },
                 body: JSON.stringify({ songId }),
+                credentials: "include"
             });
 
             if (!response.ok) {
@@ -151,7 +163,7 @@ export default function ChordAndLyric() {
             const data = await response.json();
             const updatedSongIds = data.favorite.songIds.map(id => id.toString());
             setLikedSongs(updatedSongIds);
-            console.log(`Toggled favorite for song ${songId}. New likedSongs count: ${updatedSongIds.length}`);
+            // Optionally, show toast or notification.
         } catch (error) {
             console.error("Error in handleLikeSong:", error);
             alert(`Error toggling favorite: ${error.message}`);
