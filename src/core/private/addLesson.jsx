@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import AdminSidebar from "../../components/adminSidebar.jsx";
 
 export default function AddQuiz() {
@@ -61,10 +62,17 @@ export default function AddQuiz() {
         setQuizzes(updatedQuizzes);
     };
 
+    // CSRF helper like in addPracticeSessions
+    async function getFreshCsrfToken() {
+        const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
+        const { csrfToken } = await res.json();
+        return csrfToken;
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-        
+
         const formData = new FormData();
 
         const quizData = {
@@ -85,7 +93,7 @@ export default function AddQuiz() {
             .sort((a, b) => a.fileIndex - b.fileIndex)
             .map(quiz => quiz.chordDiagram);
 
-        chordDiagrams.forEach((file, index) => {
+        chordDiagrams.forEach((file) => {
             formData.append("chordDiagrams", file);
         });
 
@@ -94,14 +102,18 @@ export default function AddQuiz() {
         });
 
         try {
-            const response = await fetch("https://localhost:3000/api/quiz/addquiz", {
-                method: "POST",
-                body: formData,
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to add quizzes");
-            }
+            const csrfToken = await getFreshCsrfToken();
+            await axios.post(
+                "https://localhost:3000/api/quiz/addquiz",
+                formData,
+                {
+                    headers: {
+                        "X-CSRF-Token": csrfToken,
+                        "Content-Type": "multipart/form-data",
+                    },
+                    withCredentials: true,
+                }
+            );
 
             alert("Quizzes added successfully!");
             setQuizzes([]);
@@ -124,7 +136,7 @@ export default function AddQuiz() {
                 <div className="absolute bottom-10 right-10 w-48 h-48 bg-blue-800 rounded-full opacity-20 animate-pulse delay-1000"></div>
                 <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-pink-800 rounded-full opacity-20 animate-pulse delay-2000"></div>
             </div>
-            
+
             <AdminSidebar />
             <div className="flex-1 flex justify-center items-center p-4 relative z-10">
                 <div className="bg-gray-800/80 backdrop-blur-xl border border-gray-700/50 rounded-xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">

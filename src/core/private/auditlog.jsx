@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import AdminSidebar from "../../components/adminSidebar.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { 
-    faUserShield, 
-    faSearch, 
-    faClock, 
-    faInfoCircle, 
+import {
+    faUserShield,
+    faSearch,
+    faClock,
+    faInfoCircle,
     faFilter,
-    faDownload,
     faRefresh,
     faEye,
     faCalendarAlt,
-    faArrowUp,
-    faArrowDown
 } from "@fortawesome/free-solid-svg-icons";
 
 const AuditLog = () => {
@@ -24,25 +22,16 @@ const AuditLog = () => {
     const [dateFilter, setDateFilter] = useState("");
     const [expandedRow, setExpandedRow] = useState(null);
 
-    useEffect(() => {
-        fetchLogs();
-    }, []);
-
+    // Fetching like in viewChords: axios withCredentials only
     const fetchLogs = async () => {
         setLoading(true);
         try {
-            const token = localStorage.getItem("token");
-            const res = await fetch("https://localhost:3000/api/audit-logs", {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
+            const response = await axios.get("https://localhost:3000/api/audit-logs", {
+                withCredentials: true
             });
-            const data = await res.json();
-            setLogs(data.logs || []);
-            setFilteredLogs(data.logs || []);
+            setLogs(response.data.logs || []);
+            setFilteredLogs(response.data.logs || []);
         } catch (err) {
-            console.error("Failed to fetch logs:", err);
             setLogs([]);
         } finally {
             setLoading(false);
@@ -50,9 +39,12 @@ const AuditLog = () => {
     };
 
     useEffect(() => {
+        fetchLogs();
+        // eslint-disable-next-line
+    }, []);
+
+    useEffect(() => {
         let filtered = logs;
-        
-        // Text filter
         if (filter.trim()) {
             filtered = filtered.filter(
                 log =>
@@ -61,15 +53,11 @@ const AuditLog = () => {
                     (log.ip || "").toLowerCase().includes(filter.toLowerCase())
             );
         }
-        
-        // Action filter
         if (actionFilter.trim()) {
-            filtered = filtered.filter(log => 
+            filtered = filtered.filter(log =>
                 log.action.toLowerCase().includes(actionFilter.toLowerCase())
             );
         }
-        
-        // Date filter
         if (dateFilter.trim()) {
             filtered = filtered.filter(log => {
                 const logDate = new Date(log.timestamp).toDateString();
@@ -77,40 +65,38 @@ const AuditLog = () => {
                 return logDate === filterDate;
             });
         }
-        
         setFilteredLogs(filtered);
     }, [filter, actionFilter, dateFilter, logs]);
 
     const getActionBadgeColor = (action) => {
         switch (action.toLowerCase()) {
-            case 'login': 
-            case 'login_success': 
+            case 'login':
+            case 'login_success':
                 return 'bg-green-900/30 text-green-300 border-green-700';
-            case 'logout': 
+            case 'logout':
                 return 'bg-red-900/30 text-red-300 border-red-700';
-            case 'register': 
+            case 'register':
                 return 'bg-blue-900/30 text-blue-300 border-blue-700';
-            case 'update_profile': 
+            case 'update_profile':
                 return 'bg-purple-900/30 text-purple-300 border-purple-700';
-            case 'lesson_completed': 
+            case 'lesson_completed':
                 return 'bg-yellow-900/30 text-yellow-300 border-yellow-700';
-            case 'session_completed': 
+            case 'session_completed':
                 return 'bg-indigo-900/30 text-indigo-300 border-indigo-700';
-            case 'login_failed': 
+            case 'login_failed':
             case 'login_blocked':
             case 'account_locked':
                 return 'bg-red-900/30 text-red-300 border-red-700';
             case 'forgot_password':
             case 'reset_password':
                 return 'bg-orange-900/30 text-orange-300 border-orange-700';
-            default: 
+            default:
                 return 'bg-gray-700/30 text-gray-300 border-gray-600';
         }
     };
 
     const formatUserAgent = (userAgent) => {
         if (!userAgent) return "—";
-        // Extract browser info
         const match = userAgent.match(/(Chrome|Firefox|Safari|Edge)\/[\d.]+/);
         return match ? match[0] : "Unknown Browser";
     };
@@ -131,11 +117,11 @@ const AuditLog = () => {
                 <div className="absolute bottom-10 right-10 w-48 h-48 bg-blue-800 rounded-full opacity-20 animate-pulse delay-1000"></div>
                 <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-pink-800 rounded-full opacity-20 animate-pulse delay-2000"></div>
             </div>
-            
+
             <AdminSidebar />
             <main className="flex-1 p-6 flex justify-center items-center overflow-hidden relative z-10">
                 <div className="w-full max-w-7xl h-full bg-gray-800/80 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
-                    
+
                     {/* Header - Fixed */}
                     <div className="bg-gradient-to-r from-cyan-700 to-blue-700 p-6 text-white">
                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -148,7 +134,7 @@ const AuditLog = () => {
                                     <p className="text-cyan-200">Monitor and track all system activities</p>
                                 </div>
                             </div>
-                            
+
                             <div className="flex items-center gap-3">
                                 <button
                                     onClick={fetchLogs}
@@ -163,7 +149,7 @@ const AuditLog = () => {
                                 </span>
                             </div>
                         </div>
-                        
+
                         {/* Advanced Filters */}
                         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             {/* Search Filter */}
@@ -176,7 +162,7 @@ const AuditLog = () => {
                                 />
                                 <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70" />
                             </div>
-                            
+
                             {/* Action Filter */}
                             <div className="relative">
                                 <select
@@ -191,7 +177,7 @@ const AuditLog = () => {
                                 </select>
                                 <FontAwesomeIcon icon={faFilter} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70" />
                             </div>
-                            
+
                             {/* Date Filter */}
                             <div className="relative">
                                 <input
@@ -202,7 +188,7 @@ const AuditLog = () => {
                                 />
                                 <FontAwesomeIcon icon={faCalendarAlt} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70" />
                             </div>
-                            
+
                             {/* Clear Filters */}
                             <button
                                 onClick={clearFilters}
@@ -290,7 +276,7 @@ const AuditLog = () => {
                                                     </td>
                                                     <td className="px-6 py-4 text-sm text-gray-300 max-w-xs">
                                                         <div className="truncate">
-                                                            {Object.keys(log.details || {}).length > 0 
+                                                            {Object.keys(log.details || {}).length > 0
                                                                 ? `${Object.keys(log.details).length} properties`
                                                                 : "No details"
                                                             }
@@ -321,13 +307,11 @@ const AuditLog = () => {
                                                         <td colSpan="6" className="px-6 py-4 bg-gray-800/50">
                                                             <div className="space-y-3">
                                                                 <h4 className="font-semibold text-gray-200 flex items-center">
-                                                                    <i className="fas fa-info-circle mr-2 text-cyan-500"></i>
                                                                     Detailed Information
                                                                 </h4>
                                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                                     <div>
                                                                         <h5 className="text-sm font-medium text-gray-400 mb-2 flex items-center">
-                                                                            <i className="fas fa-code mr-2 text-blue-500"></i>
                                                                             Details
                                                                         </h5>
                                                                         <pre className="bg-gray-900 p-3 rounded-lg text-xs overflow-auto max-h-40 border shadow-inner resize-none">
@@ -336,7 +320,6 @@ const AuditLog = () => {
                                                                     </div>
                                                                     <div>
                                                                         <h5 className="text-sm font-medium text-gray-400 mb-2 flex items-center">
-                                                                            <i className="fas fa-desktop mr-2 text-green-500"></i>
                                                                             User Agent
                                                                         </h5>
                                                                         <p className="bg-gray-900 p-3 rounded-lg text-xs border break-all shadow-inner max-h-40 overflow-auto resize-none">

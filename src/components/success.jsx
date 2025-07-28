@@ -6,6 +6,13 @@ const Success = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // CSRF helper
+  async function getFreshCsrfToken() {
+    const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
+    const { csrfToken } = await res.json();
+    return csrfToken;
+  }
+
   useEffect(() => {
     const saveSupportRecord = async () => {
       // Retrieve donation data from localStorage
@@ -18,12 +25,15 @@ const Success = () => {
 
       console.log("Attempting to save support record:", donationData);
       try {
+        const csrfToken = await getFreshCsrfToken();
         const response = await fetch("https://localhost:3000/api/support", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "X-CSRF-Token": csrfToken,
           },
+          credentials: "include",
           body: JSON.stringify(donationData),
         });
 

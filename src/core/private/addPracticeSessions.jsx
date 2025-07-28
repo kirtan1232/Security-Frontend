@@ -23,6 +23,13 @@ export default function AddPracticeSession() {
         setSession({ ...session, [name]: value });
     };
 
+    // Fetch CSRF token for mutating requests
+    async function getFreshCsrfToken() {
+        const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
+        const { csrfToken } = await res.json();
+        return csrfToken;
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -48,11 +55,18 @@ export default function AddPracticeSession() {
             mediaUrl: session.mediaUrl,
         };
 
-        console.log("Form data being sent:", formData);
-
         try {
-            const response = await axios.post("https://localhost:3000/api/sessions/", formData);
-            console.log("Response from server:", response.data);
+            const csrfToken = await getFreshCsrfToken();
+            const response = await axios.post(
+                "https://localhost:3000/api/sessions/",
+                formData,
+                {
+                    headers: {
+                        "X-CSRF-Token": csrfToken
+                    },
+                    withCredentials: true
+                }
+            );
 
             if (response.status === 201) {
                 setSuccess(`Practice session for ${session.instrument} - ${session.day} added successfully!`);
@@ -82,20 +96,6 @@ export default function AddPracticeSession() {
             return `https://www.youtube.com/embed/${url.split("youtu.be/")[1].split("?")[0]}`;
         }
         return url.replace("watch?v=", "embed/");
-    };
-
-    const getInstrumentIcon = (instrument) => {
-        switch (instrument) {
-            case 'Guitar': return '🎸';
-            case 'Piano': return '🎹';
-            case 'Ukulele': return '🎸';
-            default: return '🎵';
-        }
-    };
-
-    const getDayIcon = (day) => {
-        const dayNumber = day.split(' ')[1];
-        return `📅`;
     };
 
     return (

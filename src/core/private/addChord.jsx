@@ -97,6 +97,13 @@ const AddChord = () => {
         setLyrics([...lyrics, newLine]);
     };
 
+    // CSRF helper for POST
+    async function getFreshCsrfToken() {
+        const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
+        const { csrfToken } = await res.json();
+        return csrfToken;
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -123,9 +130,18 @@ const AddChord = () => {
         });
 
         try {
-            const response = await axios.post("https://localhost:3000/api/songs/create", formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
+            const csrfToken = await getFreshCsrfToken();
+            const response = await axios.post(
+                "https://localhost:3000/api/songs/create",
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        "X-CSRF-Token": csrfToken
+                    },
+                    withCredentials: true
+                }
+            );
 
             if (response.status === 200 || response.status === 201) {
                 alert("Chords Added Successfully!");

@@ -7,14 +7,14 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faBook, faMusic, faDonate, faChartLine, faEye, faFire, faUsers } from "@fortawesome/free-solid-svg-icons";
-import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
+import Cookies from 'js-cookie';
+import axios from "axios";
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend);
 
 const AdminDashboard = () => {
-    const { t } = useTranslation();
     const navigate = useNavigate();
     const [state, setState] = useState({
         userProfile: null,
@@ -31,25 +31,15 @@ const AdminDashboard = () => {
         isLoading: false
     });
 
+    // Use axios instead of fetch
     const fetchWithToken = useCallback(async (url, errorMessage) => {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            throw new Error(`${t('Error')}: ${t('No token found, please log in again')}`);
+        try {
+            const response = await axios.get(url, { withCredentials: true });
+            return response.data;
+        } catch (error) {
+            throw new Error(`Error: ${errorMessage}`);
         }
-        
-        const response = await fetch(url, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error(`${t('Error')}: ${errorMessage}`);
-        }
-        return response.json();
-    }, [t]);
+    }, []);
 
     const fetchData = useCallback(async () => {
         setState(prev => ({ ...prev, isLoading: true }));
@@ -130,7 +120,7 @@ const AdminDashboard = () => {
             labels: uniqueDates,
             datasets: [
                 {
-                    label: t('Total Users'),
+                    label: 'Total Users',
                     data: usersCounts,
                     borderColor: 'rgba(139, 92, 246, 1)',
                     backgroundColor: 'rgba(139, 92, 246, 0.1)',
@@ -145,7 +135,7 @@ const AdminDashboard = () => {
                     borderWidth: 3,
                 },
                 {
-                    label: t('Total Lessons'),
+                    label: 'Total Lessons',
                     data: lessonsCounts,
                     borderColor: 'rgba(251, 146, 60, 1)',
                     backgroundColor: 'rgba(251, 146, 60, 0.1)',
@@ -160,7 +150,7 @@ const AdminDashboard = () => {
                     borderWidth: 3,
                 },
                 {
-                    label: t('Total Songs'),
+                    label: 'Total Songs',
                     data: songsCounts,
                     borderColor: 'rgba(34, 197, 94, 1)',
                     backgroundColor: 'rgba(34, 197, 94, 0.1)',
@@ -176,12 +166,12 @@ const AdminDashboard = () => {
                 },
             ],
         };
-    }, [state.usersData, state.lessonsData, state.songsData, t]);
+    }, [state.usersData, state.lessonsData, state.songsData]);
 
     const doughnutChartData = {
-        labels: [t('Total Users'), t('Total Lessons'), t('Total Songs')],
+        labels: ['Total Users', 'Total Lessons', 'Total Songs'],
         datasets: [{
-            label: t('Metrics'),
+            label: 'Metrics',
             data: [state.totalUsers, state.totalLessons, state.totalSongs],
             backgroundColor: [
                 'rgba(139, 92, 246, 0.8)',
@@ -214,7 +204,7 @@ const AdminDashboard = () => {
                 },
                 title: {
                     display: true,
-                    text: t('Cumulative Metrics Over Time'),
+                    text: 'Cumulative Metrics Over Time',
                     color: '#e5e7eb',
                     font: { size: 18, weight: 'bold' },
                     padding: 20,
@@ -254,7 +244,7 @@ const AdminDashboard = () => {
                 },
                 title: {
                     display: true,
-                    text: t('Dashboard Metrics Distribution'),
+                    text: 'Dashboard Metrics Distribution',
                     color: '#e5e7eb',
                     font: { size: 18, weight: 'bold' },
                     padding: 20,
@@ -295,13 +285,13 @@ const AdminDashboard = () => {
 
     const getTitleStyles = (title) => {
         switch (title) {
-            case t('Total Users'):
+            case 'Total Users':
                 return { textColor: '#8b5cf6', borderColor: '#8b5cf6' }; // Purple
-            case t('Total Lessons'):
+            case 'Total Lessons':
                 return { textColor: '#fb923c', borderColor: '#fb923c' }; // Orange
-            case t('Total Songs'):
+            case 'Total Songs':
                 return { textColor: '#22c55e', borderColor: '#22c55e' }; // Green
-            case t('Total Donations'):
+            case 'Total Donations':
                 return { textColor: '#ec4899', borderColor: '#ec4899' }; // Pink
             default:
                 return { textColor: '#ffffff', borderColor: '#ffffff' }; // Default white
@@ -353,7 +343,7 @@ const AdminDashboard = () => {
     };
 
     return (
-        <div className={`min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 flex flex-col md:flex-row overflow-hidden ${t('language') === 'ne' ? 'font-noto-sans' : ''}`}>
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 flex flex-col md:flex-row overflow-hidden">
             {/* Animated background elements */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-10 left-10 w-64 h-64 bg-purple-800 rounded-full opacity-20 animate-pulse"></div>
@@ -369,15 +359,15 @@ const AdminDashboard = () => {
                     }`}>
                         <div>
                             <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
-                                {t('Admin Dashboard')}
+                                Admin Dashboard
                             </h1>
                             <div className="h-1 w-20 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></div>
                         </div>
                         <div className="flex items-center space-x-4 mt-4 md:mt-0">
                             <div className="text-right">
-                                <p className="text-sm text-gray-400">{t('Welcome back')}</p>
+                                <p className="text-sm text-gray-400">Welcome back</p>
                                 <p className="text-lg font-semibold text-gray-200">
-                                    {state.userProfile ? state.userProfile.name : t('Admin')}
+                                    {state.userProfile ? state.userProfile.name : "Admin"}
                                 </p>
                             </div>
                             <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
@@ -390,7 +380,7 @@ const AdminDashboard = () => {
                         <div className="mb-6 p-4 bg-red-900/30 border border-red-700 text-red-200 rounded-xl backdrop-blur-sm">
                             <div className="flex items-center">
                                 <FontAwesomeIcon icon={faFire} className="mr-2" />
-                                {t('Error')}: {state.error}
+                                Error: {state.error}
                             </div>
                         </div>
                     )}
@@ -404,7 +394,7 @@ const AdminDashboard = () => {
                             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
                                 <StatCard
                                     icon={faUsers}
-                                    title={t('Total Users')}
+                                    title="Total Users"
                                     value={state.totalUsers}
                                     loading={state.isLoading}
                                     gradient="from-purple-500 to-purple-700"
@@ -412,7 +402,7 @@ const AdminDashboard = () => {
                                 />
                                 <StatCard
                                     icon={faBook}
-                                    title={t('Total Lessons')}
+                                    title="Total Lessons"
                                     value={state.totalLessons}
                                     loading={state.isLoading}
                                     gradient="from-orange-500 to-red-600"
@@ -420,7 +410,7 @@ const AdminDashboard = () => {
                                 />
                                 <StatCard
                                     icon={faMusic}
-                                    title={t('Total Songs')}
+                                    title="Total Songs"
                                     value={state.totalSongs}
                                     loading={state.isLoading}
                                     gradient="from-green-500 to-emerald-600"
@@ -428,8 +418,8 @@ const AdminDashboard = () => {
                                 />
                                 <StatCard
                                     icon={faDonate}
-                                    title={t('Total Donations')}
-                                    value={`${t('Rs')} ${state.totalDonations}`}
+                                    title="Total Donations"
+                                    value={`Rs ${state.totalDonations}`}
                                     loading={state.isLoading}
                                     gradient="from-pink-500 to-rose-600"
                                     delay={400}
@@ -442,7 +432,7 @@ const AdminDashboard = () => {
                                 }`} style={{ transitionDelay: '600ms' }}>
                                     <div className="flex items-center mb-4">
                                         <FontAwesomeIcon icon={faChartLine} className="text-2xl text-purple-600 mr-3" />
-                                        <h3 className="text-xl font-bold text-gray-200">{t('Growth Analytics')}</h3>
+                                        <h3 className="text-xl font-bold text-gray-200">Growth Analytics</h3>
                                     </div>
                                     <div className="h-80">
                                         {(state.usersData.length > 0 || state.lessonsData.length > 0 || state.songsData.length > 0) ? (
@@ -451,7 +441,7 @@ const AdminDashboard = () => {
                                             <div className="flex items-center justify-center h-full">
                                                 <div className="text-center">
                                                     <FontAwesomeIcon icon={faChartLine} className="text-4xl text-gray-400 mb-4" />
-                                                    <p className="text-gray-400">{t('No data available for line chart')}</p>
+                                                    <p className="text-gray-400">No data available for line chart</p>
                                                 </div>
                                             </div>
                                         )}
@@ -463,7 +453,7 @@ const AdminDashboard = () => {
                                 }`} style={{ transitionDelay: '700ms' }}>
                                     <div className="flex items-center mb-4">
                                         <FontAwesomeIcon icon={faEye} className="text-2xl text-blue-600 mr-3" />
-                                        <h3 className="text-xl font-bold text-gray-200">{t('Distribution Overview')}</h3>
+                                        <h3 className="text-xl font-bold text-gray-200">Distribution Overview</h3>
                                     </div>
                                     <div className="h-80">
                                         <Doughnut data={doughnutChartData} options={chartOptions.doughnut} />
@@ -476,7 +466,7 @@ const AdminDashboard = () => {
                             }`} style={{ transitionDelay: '800ms' }}>
                                 <div className="flex items-center mb-4">
                                     <FontAwesomeIcon icon={faChartLine} className="text-2xl text-green-600 mr-3" />
-                                    <h3 className="text-xl font-bold text-gray-200">{t('Calendar View')}</h3>
+                                    <h3 className="text-xl font-bold text-gray-200">Calendar View</h3>
                                 </div>
                                 <div className="calendar-container">
                                     <style jsx>{`
@@ -539,8 +529,6 @@ const AdminDashboard = () => {
     );
 };
 
-AdminDashboard.propTypes = {
-    // Add any specific props if needed
-};
+AdminDashboard.propTypes = {};
 
 export default AdminDashboard;
