@@ -25,6 +25,7 @@ export default function SessionDetails() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
+          credentials: "include"
         });
 
         if (!response.ok) {
@@ -70,6 +71,7 @@ export default function SessionDetails() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
+          credentials: "include"
         });
         if (!response.ok) {
           throw new Error("Failed to fetch completion status");
@@ -119,6 +121,13 @@ export default function SessionDetails() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Fetch a fresh CSRF token for mutating requests
+  async function getFreshCsrfToken() {
+    const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
+    const { csrfToken } = await res.json();
+    return csrfToken;
+  }
+
   const markAsComplete = async () => {
     if (!canMarkComplete) {
       toast.warn("Finish the practice first.", {
@@ -129,13 +138,16 @@ export default function SessionDetails() {
     }
 
     try {
+      const csrfToken = await getFreshCsrfToken();
       const response = await fetch("https://localhost:3000/api/completed-sessions/toggle", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "X-CSRF-Token": csrfToken
         },
         body: JSON.stringify({ day, instrument }),
+        credentials: "include"
       });
 
       if (!response.ok) {

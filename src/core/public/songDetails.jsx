@@ -19,32 +19,24 @@ const SongDetails = () => {
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
-                const response = await fetch("https://localhost:3000/api/auth/profile", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
+                // Use only cookies (no Authorization header, no localStorage)
+                const response = await axios.get("https://localhost:3000/api/auth/profile", {
+                    withCredentials: true,
                 });
-
-                if (!response.ok) {
-                    throw new Error("Failed to fetch profile");
-                }
-
-                const data = await response.json();
-                console.log("SongDetails Profile Data:", data);
-                setUserProfile(data);
+                setUserProfile(response.data);
             } catch (error) {
-                alert("Error fetching user profile: " + error.message);
+                alert("Error fetching user profile: " + (error.response?.data?.message || error.message));
             }
         };
 
         const fetchSong = async () => {
             try {
-                const response = await axios.get(`https://localhost:3000/api/songs/${songId}`);
+                const response = await axios.get(`https://localhost:3000/api/songs/${songId}`, {
+                    withCredentials: true,
+                });
                 setSong(response.data);
             } catch (error) {
-                alert("Error fetching song details: " + error.message);
+                alert("Error fetching song details: " + (error.response?.data?.message || error.message));
             } finally {
                 setLoading(false);
             }

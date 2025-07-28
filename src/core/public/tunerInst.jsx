@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/sidebar.jsx";
+import Footer from "../../components/footer.jsx";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 const instruments = {
   guitar: ["E (Low)", "A", "D", "G", "B", "E (High)"],
@@ -145,6 +147,7 @@ class Tuner {
       this.oscillator = null;
     }
   }
+  
 }
 
 const Meter = ({ cents, isInTune }) => {
@@ -334,20 +337,11 @@ const TunerComponent = () => {
 
   const fetchUserProfile = async () => {
     try {
-      const response = await fetch("https://localhost:3000/api/auth/profile", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+      // Only use cookies, no Authorization header
+      const response = await axios.get("https://localhost:3000/api/auth/profile", {
+        withCredentials: true,
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch profile");
-      }
-
-      const data = await response.json();
-      setUserProfile(data);
+      setUserProfile(response.data);
     } catch (error) {
       console.error("Error fetching user profile:", error);
     }
@@ -465,9 +459,10 @@ const TunerComponent = () => {
             )}
           </div>
         </div>
-      </div>
+      </div>   
     </div>
   );
 };
+
 
 export default TunerComponent;
