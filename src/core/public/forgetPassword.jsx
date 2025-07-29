@@ -14,7 +14,7 @@ const ForgetPassword = () => {
 
     // Use useMemo to prevent recreation of bubbles on re-render
     const bubbles = useMemo(() => {
-        const bubbleCount = 12;
+        const bubbleCount = 5;
         return Array.from({ length: bubbleCount }).map((_, i) => ({
             id: i,
             size: Math.random() * 40 + 20,
@@ -87,109 +87,147 @@ const ForgetPassword = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
-            {/* Animated Background with three colors */}
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-400 via-pink-300 to-blue-300 opacity-90">
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 flex items-center justify-center relative overflow-hidden">
+            {/* Animated background elements */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
                 {bubbles.map(bubble => (
                     <div 
-                        key={`bubble-${bubble.id}`} // Unique key based on stable id
-                        className="absolute rounded-full bg-white pointer-events-none"
+                        key={`bubble-${bubble.id}`} 
+                        className="absolute rounded-full bg-purple-800 opacity-20 animate-pulse"
                         style={{
                             width: `${bubble.size}px`,
                             height: `${bubble.size}px`,
                             left: `${bubble.left}%`,
                             top: `${bubble.top}%`,
-                            opacity: bubble.opacity,
-                            animation: `float ${bubble.duration}s linear ${bubble.delay}s infinite`,
-                            willChange: 'transform',
+                            animation: `pulse ${bubble.duration}s linear ${bubble.delay}s infinite`,
                         }}
                     />
                 ))}
             </div>
-            
-            {/* Rest of your component remains the same */}
-            <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex w-full max-w-5xl min-h-[550px] relative z-10">
-                {/* Left Section - Illustration */}
-                <div className="w-1/2 bg-gradient-to-br from-purple-600 via-purple-700 to-blue-800 flex items-center justify-center relative overflow-hidden">
-                    {/* Background decorative elements */}
-                    <div className="absolute inset-0 opacity-20">
-                        <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full"></div>
-                        <div className="absolute bottom-20 right-20 w-20 h-20 bg-yellow-300 rounded-full"></div>
-                        <div className="absolute top-1/2 left-1/4 w-8 h-8 bg-pink-300 rounded-full"></div>
-                    </div>
-                    
-                    {/* Logo */}
-                    <div className="relative z-10 text-center">
-                        <div className="bg-white bg-opacity-20 rounded-2xl p-8 mb-4 backdrop-blur-sm">
-                            <img 
-                                src={logoImage}
-                                alt="Anna Logo" 
-                                className="w-48 h-48 mx-auto object-contain"
-                            />
-                        </div>
-                        <button
-                            className="px-6 py-2 border-2 border-white rounded-full text-white text-base font-semibold hover:bg-white hover:text-purple-600 transition-all duration-200 shadow-sm mt-6"
-                            onClick={handleSignInClick}
-                        >
-                            SIGN IN
-                        </button>
-                    </div>
-                </div>
-
-                {/* Right Section - Forgot Password Form */}
+            {/* Reset Container */}
+            <div className="bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-700/50 overflow-hidden flex w-full max-w-5xl min-h-[600px] relative z-10">
+                {/* Left Section - Form */}
                 <div className="w-1/2 p-12 flex flex-col justify-center">
                     <div className="max-w-md mx-auto w-full">
-                        <h2 className="text-3xl font-bold text-purple-800 mb-2 text-center">RESET PASSWORD</h2>
-                        <p className="text-purple-600 mb-8 text-center">
+                        <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-4 text-center">
+                            Forgot Password
+                        </h2>
+                        <p className="text-gray-300 mb-8 text-center text-lg">
                             Enter your email to receive a password reset link
                         </p>
-
-                        <form onSubmit={handleForgotPassword} className="space-y-4">
+                        <form onSubmit={handleForgotPassword} className="space-y-6">
                             {/* Email Input */}
-                            <div className="relative">
-                                <FontAwesomeIcon 
-                                    icon={faEnvelope} 
-                                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                                />
+                            <div className="relative group">
+                                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
+                                    <FontAwesomeIcon
+                                        icon={faEnvelope}
+                                        className="text-gray-400 group-focus-within:text-purple-400 transition-colors duration-300"
+                                    />
+                                </div>
                                 <input
                                     type="email"
                                     placeholder="Enter Email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    className="w-full pl-12 pr-14 py-4 text-white bg-gray-700/90 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 placeholder-gray-400"
                                     required
                                 />
                             </div>
-
                             {/* Reset Button */}
                             <div className="flex justify-center">
                                 <button
                                     type="submit"
-                                    className="bg-purple-600 text-white py-2 px-6 rounded-lg font-medium hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                                    className="group relative overflow-hidden py-4 px-8 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 rounded-xl text-white font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none w-full"
                                     disabled={loading}
                                 >
-                                    {loading ? "Sending..." : "Send Reset Link"}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    <span className="relative flex items-center justify-center space-x-2">
+                                        {loading ? (
+                                            <>
+                                                <svg
+                                                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <circle
+                                                        className="opacity-25"
+                                                        cx="12"
+                                                        cy="12"
+                                                        r="10"
+                                                        stroke="currentColor"
+                                                        strokeWidth="4"
+                                                    ></circle>
+                                                    <path
+                                                        className="opacity-75"
+                                                        fill="currentColor"
+                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                    ></path>
+                                                </svg>
+                                                <span>Sending...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span>Send Reset Link</span>
+                                                <svg
+                                                    className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M13 7l5 5m0 0l-5 5m5-5H6"
+                                                    />
+                                                </svg>
+                                            </>
+                                        )}
+                                    </span>
                                 </button>
                             </div>
                         </form>
+                        {/* Sign In Link */}
+                        <div className="mt-8 text-center">
+                            <span className="text-gray-300">
+                                Remember your password?{" "}
+                                <button
+                                    onClick={handleSignInClick}
+                                    className="text-purple-400 hover:text-purple-300 font-medium cursor-pointer transition-colors duration-300"
+                                >
+                                    Sign In
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {/* Right Section - Illustration */}
+                <div className="w-1/2 bg-gradient-to-br from-indigo-800 via-purple-800 to-indigo-900 flex items-center justify-center relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-10">
+                        <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full animate-pulse"></div>
+                        <div className="absolute bottom-20 right-20 w-20 h-20 bg-blue-400 rounded-full animate-pulse delay-1000"></div>
+                        <div className="absolute top-1/2 left-1/4 w-8 h-8 bg-purple-400 rounded-full animate-pulse delay-500"></div>
+                        <div className="absolute top-1/4 right-1/3 w-16 h-16 bg-pink-400 rounded-full animate-pulse delay-2000"></div>
+                        <div className="absolute bottom-1/3 left-1/2 w-12 h-12 bg-indigo-400 rounded-full animate-pulse delay-1500"></div>
+                    </div>
+                    <div className="relative z-10 text-center">
+                        <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 mb-6 border border-white/20 shadow-2xl">
+                            <div className="w-48 h-48 mx-auto bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                                <img
+                                    src={logoImage}
+                                    alt="Anna Logo"
+                                    className="w-40 h-40 object-contain filter drop-shadow-lg"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <h3 className="text-2xl font-bold text-white">Recover Your Account</h3>
+                            <p className="text-gray-200 text-lg">Reset your password with ease</p>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            {/* Animation definition */}
-            <style jsx global>{`
-                @keyframes float {
-                    0% {
-                        transform: translateY(0) translateX(0);
-                    }
-                    50% {
-                        transform: translateY(-30px) translateX(15px);
-                    }
-                    100% {
-                        transform: translateY(0) translateX(0);
-                    }
-                }
-            `}</style>
         </div>
     );
 };
