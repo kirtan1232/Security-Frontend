@@ -70,8 +70,24 @@ const LoginPage = ({ setIsAuthenticated, setIsAdmin }) => {
                 }
             );
             
-            const { token, role } = response.data;
+            const { token, role, passwordLastChanged } = response.data;
             
+            // Check password expiry (30 days)
+            if (passwordLastChanged) {
+                const passwordExpiryDays = 30;
+                const lastChanged = new Date(passwordLastChanged);
+                const now = new Date();
+                const daysSinceChange = Math.floor((now - lastChanged) / (1000 * 60 * 60 * 24));
+                if (daysSinceChange > passwordExpiryDays) {
+                    toast.error("Your password has expired. Please reset your password.");
+                    Cookies.remove('authToken');
+                    Cookies.remove('userRole');
+                    navigate("/resetPassword", { state: { email } });
+                    setLoading(false);
+                    return;
+                }
+            }
+
             // Only store in cookies, not in localStorage
             Cookies.set('authToken', token, { secure: true, sameSite: 'strict', expires: 1/24 }); // 1 hour
             Cookies.set('userRole', role, { secure: true, sameSite: 'strict', expires: 1/24 }); // 1 hour
