@@ -6,6 +6,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import zxcvbn from "zxcvbn";
+import { sanitizeText } from "../../components/sanitizer"; // <-- Add this line
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -36,11 +37,17 @@ const RegisterPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!name || !email || !password || !confirmPassword) {
+        // Sanitize all user inputs
+        const safeName = sanitizeText(name);
+        const safeEmail = sanitizeText(email);
+        const safePassword = sanitizeText(password);
+        const safeConfirmPassword = sanitizeText(confirmPassword);
+        
+        if (!safeName || !safeEmail || !safePassword || !safeConfirmPassword) {
             toast.error("All fields are required!");
             return;
         }
-        if (password !== confirmPassword) {
+        if (safePassword !== safeConfirmPassword) {
             toast.error("Passwords do not match!");
             return;
         }
@@ -57,9 +64,9 @@ const RegisterPage = () => {
             const response = await axios.post(
                 `${API_URL}/auth/register`,
                 {
-                    name,
-                    email,
-                    password,
+                    name: safeName,
+                    email: safeEmail,
+                    password: safePassword,
                     role: "user",
                 },
                 {
@@ -69,7 +76,7 @@ const RegisterPage = () => {
             );
             if (response.status === 201) {
                 toast.success("Account created! Please check your email for a 6-digit OTP to verify your email.");
-                navigate("/otp", { state: { userId: response.data.userId, email: email } });
+                navigate("/otp", { state: { userId: response.data.userId, email: safeEmail } });
             }
         } catch (err) {
             const message = err.response?.data?.message || "Error registering user. Please try again.";
