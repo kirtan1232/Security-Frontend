@@ -38,26 +38,35 @@ const Sidebar = () => {
     const handleConfirmLogout = async () => {
         try {
             // Server-side logout request with credentials for cookies
-            await fetch("https://localhost:3000/api/auth/logout", {
+            const response = await fetch("https://localhost:3000/api/auth/logout", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "X-CSRF-Token": Cookies.get('csrfToken')
                 },
                 credentials: 'include',
             });
 
-            // Only clear cookies
-            Cookies.remove('authToken', { path: '/' });
-            Cookies.remove('userRole', { path: '/' });
-            document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            document.cookie = "userRole=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            if (response.ok) {
+                // Clear client-side cookies
+                Cookies.remove('authToken', { path: '/' });
+                Cookies.remove('userRole', { path: '/' });
+                Cookies.remove('csrfToken', { path: '/' });
 
-            toast.success('Logged out successfully', {
-                position: "top-right",
-                autoClose: 1500,
-            });
+                // Clear any browser cookies explicitly
+                document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                document.cookie = "userRole=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                document.cookie = "csrfToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
-            navigate("/login");
+                toast.success('Logged out successfully', {
+                    position: "top-right",
+                    autoClose: 1500,
+                });
+
+                navigate("/login");
+            } else {
+                throw new Error('Logout failed');
+            }
         } catch (error) {
             console.error("Logout error:", error);
             toast.error('Failed to logout', {
