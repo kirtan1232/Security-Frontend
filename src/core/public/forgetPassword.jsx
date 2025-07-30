@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logoImage from "../../assets/images/logo.png";
+import { sanitizeText } from "../../components/sanitizer"; // <-- Import sanitizer
 
 const ForgetPassword = () => {
     const [email, setEmail] = useState('');
@@ -37,7 +38,9 @@ const ForgetPassword = () => {
         e.preventDefault();
         setLoading(true);
 
-        if (!email) {
+        const safeEmail = sanitizeText(email); // Sanitize input
+
+        if (!safeEmail) {
             toast.error("Please enter your email.", {
                 position: "top-right",
                 autoClose: 3000,
@@ -50,7 +53,7 @@ const ForgetPassword = () => {
             const csrfToken = await getFreshCsrfToken();
             const response = await axios.post(
                 'https://localhost:3000/api/auth/forgotPassword',
-                { email },
+                { email: safeEmail }, // Use sanitized email
                 {
                     headers: {
                         "X-CSRF-Token": csrfToken
