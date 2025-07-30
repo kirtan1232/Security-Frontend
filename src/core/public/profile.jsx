@@ -6,6 +6,7 @@ import Sidebar from "../../components/sidebar.jsx";
 import zxcvbn from "zxcvbn";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { sanitizeText } from "../../components/sanitizer"; // <-- Add this import
 
 export default function Profile() {
     const navigate = useNavigate();
@@ -98,11 +99,16 @@ export default function Profile() {
     // Secure password change
     const handlePasswordChange = async () => {
         setError("");
-        if (!oldPassword || !newPassword || !confirmPassword) {
+        // Sanitize password inputs before sending
+        const safeOldPassword = sanitizeText(oldPassword);
+        const safeNewPassword = sanitizeText(newPassword);
+        const safeConfirmPassword = sanitizeText(confirmPassword);
+
+        if (!safeOldPassword || !safeNewPassword || !safeConfirmPassword) {
             toast.error("Please fill in all password fields", { position: "top-right", autoClose: 3000 });
             return;
         }
-        if (newPassword !== confirmPassword) {
+        if (safeNewPassword !== safeConfirmPassword) {
             setError("New passwords do not match!");
             return;
         }
@@ -110,6 +116,12 @@ export default function Profile() {
             setError("Password is too weak! Try a mix of letters, numbers, symbols, and make it longer.");
             return;
         }
+        // === CLIENT-SIDE: Prevent same password ===
+        if (safeOldPassword && safeNewPassword && safeOldPassword === safeNewPassword) {
+            toast.error("You can't put the same password as before.", { position: "top-right", autoClose: 3000 });
+            return;
+        }
+        // === END CLIENT-SIDE CHECK ===
 
         // Fetch a fresh CSRF token before the update
         let freshCsrfToken = "";
@@ -123,8 +135,8 @@ export default function Profile() {
         }
 
         const formData = new FormData();
-        formData.append("oldPassword", oldPassword);
-        formData.append("newPassword", newPassword);
+        formData.append("oldPassword", safeOldPassword);
+        formData.append("newPassword", safeNewPassword);
 
         try {
             const response = await fetch("https://localhost:3000/api/auth/update-profile", {
@@ -136,13 +148,35 @@ export default function Profile() {
                 credentials: "include"
             });
 
-            if (response.status === 401 || response.status === 403) {
+            // === IMPROVED ERROR HANDLING: Only redirect on 401 (unauthenticated) ===
+            if (response.status === 401) {
                 navigate("/login");
                 return;
             }
 
+            if (response.status === 403) {
+                // Check for "Old password is incorrect."
+                const errorData = await response.json();
+                if (errorData.message === "Old password is incorrect.") {
+                    setError("Old password is incorrect.");
+                    return;
+                }
+                setError(errorData.message || "Forbidden");
+                return;
+            }
+            // === END IMPROVED HANDLING ===
+
             if (!response.ok) {
                 const errorData = await response.json();
+                // === SHOW TOAST FOR SAME PASSWORD ===
+                if (
+                    errorData.message === "You can't set the same password as before." ||
+                    errorData.message === "You cant put same password" // accept both spellings
+                ) {
+                    toast.error("You can't use the same password as your old one.", { position: "top-right", autoClose: 3000 });
+                    return;
+                }
+                // === END TOAST ===
                 throw new Error(errorData.message || "Failed to update password");
             }
 
@@ -164,8 +198,13 @@ export default function Profile() {
         e.preventDefault();
         setError("");
 
+        // Sanitize user input before sending
+        const safeName = sanitizeText(user.name.trim());
+        const safeEmail = sanitizeText(user.email.trim());
+        const safeAbout = sanitizeText(user.about.trim());
+
         // Input validation
-        if (!user.name.trim() || !user.email.trim()) {
+        if (!safeName || !safeEmail) {
             toast.error("Name and email are required.", { autoClose: 3000 });
             return;
         }
@@ -182,9 +221,9 @@ export default function Profile() {
         }
 
         const formData = new FormData();
-        formData.append("name", user.name.trim());
-        formData.append("email", user.email.trim());
-        formData.append("about", user.about.trim());
+        formData.append("name", safeName);
+        formData.append("email", safeEmail);
+        formData.append("about", safeAbout);
         if (image) formData.append("profilePicture", image);
 
         try {
