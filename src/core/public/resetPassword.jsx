@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import logoImage from "../../assets/images/logo.png";
 import { useNavigate } from "react-router-dom";
 import zxcvbn from "zxcvbn";
+import { sanitizeText } from "../../components/sanitizer"; // <-- Import sanitizer
 
 const ResetPasswordPage = () => {
     const [token, setToken] = useState('');
@@ -64,7 +65,11 @@ const ResetPasswordPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!newPassword || !confirmPassword) {
+        // Sanitize input
+        const safeNewPassword = sanitizeText(newPassword);
+        const safeConfirmPassword = sanitizeText(confirmPassword);
+
+        if (!safeNewPassword || !safeConfirmPassword) {
             toast.error("Please fill in both password fields.", {
                 position: "top-right",
                 autoClose: 3000,
@@ -72,7 +77,7 @@ const ResetPasswordPage = () => {
             return;
         }
 
-        if (newPassword !== confirmPassword) {
+        if (safeNewPassword !== safeConfirmPassword) {
             toast.error("Passwords do not match.", {
                 position: "top-right",
                 autoClose: 3000,
@@ -96,7 +101,7 @@ const ResetPasswordPage = () => {
             const csrfToken = await getFreshCsrfToken();
             const response = await axios.post(
                 'https://localhost:3000/api/auth/reset-password',
-                { token, newPassword },
+                { token, newPassword: safeNewPassword },
                 {
                     headers: {
                         "X-CSRF-Token": csrfToken
