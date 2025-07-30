@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ReCAPTCHA from "react-google-recaptcha";
 import Cookies from 'js-cookie';
+import { sanitizeText } from "../../components/sanitizer";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
@@ -18,26 +19,12 @@ const LoginPage = ({ setIsAuthenticated, setIsAdmin }) => {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [captchaToken, setCaptchaToken] = useState("");
-    const [csrfToken, setCsrfToken] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch CSRF token on mount
-        axios.get(`${API_URL}/csrf-token`, { withCredentials: true })
-            .then(res => setCsrfToken(res.data.csrfToken))
-            .catch(() => setCsrfToken(""));
-
-        // Check for auth cookie only (remove localStorage logic)
-        const authCookie = Cookies.get('authToken');
-        const roleCookie = Cookies.get('userRole');
-        
-        if (authCookie && roleCookie) {
-            axios.defaults.headers.common['Authorization'] = `Bearer ${authCookie}`;
-            setIsAuthenticated(true);
-            setIsAdmin(roleCookie === "admin");
-            navigate("/dashboard");
-        }
-    }, [navigate, setIsAuthenticated, setIsAdmin]);
+        // Remove initial auth check to prevent showing tokens before login
+        // CSRF token will be fetched only on login attempt
+    }, []);
 
     const handleSignUpClick = () => {
         navigate("/register");
@@ -49,7 +36,11 @@ const LoginPage = ({ setIsAuthenticated, setIsAdmin }) => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        if (!email || !password) {
+        // Sanitize user inputs
+        const safeEmail = sanitizeText(email);
+        const safePassword = sanitizeText(password);
+    
+        if (!safeEmail || !safePassword) {
             toast.error("Please fill in both fields.");
             return;
         }
@@ -59,11 +50,16 @@ const LoginPage = ({ setIsAuthenticated, setIsAdmin }) => {
         }
         if (loading) return;
         setLoading(true);
+    
         try {
+            // Fetch CSRF token before login attempt
+            const csrfResponse = await axios.get(`${API_URL}/csrf-token`, { withCredentials: true });
+            const csrfToken = csrfResponse.data.csrfToken;
+    
             delete axios.defaults.headers.common['Authorization'];
             const response = await axios.post(
                 `${API_URL}/auth/login`,
-                { email, password, captchaToken },
+                { email: safeEmail, password: safePassword, captchaToken },
                 {
                     withCredentials: true,
                     headers: { "X-CSRF-Token": csrfToken }
@@ -80,18 +76,13 @@ const LoginPage = ({ setIsAuthenticated, setIsAdmin }) => {
                 const daysSinceChange = Math.floor((now - lastChanged) / (1000 * 60 * 60 * 24));
                 if (daysSinceChange > passwordExpiryDays) {
                     toast.error("Your password has expired. Please reset your password.");
-                    Cookies.remove('authToken');
-                    Cookies.remove('userRole');
                     navigate("/resetPassword", { state: { email } });
                     setLoading(false);
                     return;
                 }
             }
 
-            // Only store in cookies, not in localStorage
-            Cookies.set('authToken', token, { secure: true, sameSite: 'strict', expires: 1/24 }); // 1 hour
-            Cookies.set('userRole', role, { secure: true, sameSite: 'strict', expires: 1/24 }); // 1 hour
-            
+            // Tokens are set in backend cookies, so no need to set them here
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             setIsAuthenticated(true);
             setIsAdmin(role === "admin");
