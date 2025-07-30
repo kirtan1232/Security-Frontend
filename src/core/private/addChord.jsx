@@ -3,6 +3,7 @@ import * as mammoth from "mammoth";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import AdminSidebar from "../../components/adminSidebar.jsx";
 import axios from 'axios';
+import { sanitizeText } from "../../components/sanitizer"; // <-- Import sanitizer
 
 const AddChord = () => {
     const [songName, setSongName] = useState("");
@@ -53,9 +54,14 @@ const AddChord = () => {
             if (parts.length >= 2) {
                 const [section, ...rest] = parts;
                 const [lyric, chord = ""] = rest.join(":").split(" ");
-                return { section: section.trim(), lyric: lyric.trim(), chord: chord.trim() };
+                // Sanitize parsed docx input
+                return {
+                    section: sanitizeText(section.trim()),
+                    lyric: sanitizeText(lyric.trim()),
+                    chord: sanitizeText(chord.trim())
+                };
             }
-            return { section: "", lyric: line.trim(), chord: "" };
+            return { section: "", lyric: sanitizeText(line.trim()), chord: "" };
         });
         return parsedLyrics;
     };
@@ -75,7 +81,8 @@ const AddChord = () => {
 
     const handleLyricsChange = (index, field, value) => {
         const updatedLyrics = [...lyrics];
-        updatedLyrics[index][field] = value;
+        // Sanitize lyric input field
+        updatedLyrics[index][field] = sanitizeText(value);
         setLyrics(updatedLyrics);
     };
 
@@ -108,16 +115,27 @@ const AddChord = () => {
         e.preventDefault();
         setIsSubmitting(true);
 
-        if (!songName.trim()) {
+        // Sanitize song name and instrument
+        const safeSongName = sanitizeText(songName);
+        const safeSelectedInstrument = sanitizeText(selectedInstrument);
+
+        if (!safeSongName.trim()) {
             alert("Song title is required.");
             setIsSubmitting(false);
             return;
         }
 
+        // Sanitize all lyrics fields before send
+        const sanitizedLyrics = lyrics.map(({ section, lyric, chord }) => ({
+            section: sanitizeText(section),
+            lyrics: sanitizeText(lyric),
+            chord: sanitizeText(chord),
+        }));
+
         const formData = new FormData();
-        formData.append("songName", songName);
-        formData.append("selectedInstrument", selectedInstrument);
-        formData.append("lyrics", JSON.stringify(lyrics.map(({ section, lyric, chord }) => ({ section, lyrics: lyric, chord }))));
+        formData.append("songName", safeSongName);
+        formData.append("selectedInstrument", safeSelectedInstrument);
+        formData.append("lyrics", JSON.stringify(sanitizedLyrics));
 
         chordDiagrams.forEach((file) => {
             formData.append("chordDiagrams", file);
@@ -222,7 +240,7 @@ const AddChord = () => {
                                 <input
                                     type="text"
                                     value={songName}
-                                    onChange={(e) => setSongName(e.target.value)}
+                                    onChange={(e) => setSongName(sanitizeText(e.target.value))}
                                     className="w-full p-4 border-2 border-gray-600 rounded-xl shadow-sm bg-gray-700/50 text-gray-300 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all duration-200"
                                     placeholder="Enter the song title..."
                                 />
@@ -237,7 +255,7 @@ const AddChord = () => {
                                 <div className="relative">
                                     <select
                                         value={selectedInstrument}
-                                        onChange={handleInstrumentChange}
+                                        onChange={(e) => setSelectedInstrument(sanitizeText(e.target.value))}
                                         className="w-full p-4 border-2 border-gray-600 rounded-xl bg-gray-700/50 text-gray-300 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all duration-200 appearance-none cursor-pointer"
                                     >
                                         <option value="ukulele">🎸 Ukulele</option>
