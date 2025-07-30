@@ -12,6 +12,7 @@ import {
     faEye,
     faCalendarAlt,
 } from "@fortawesome/free-solid-svg-icons";
+import { sanitizeText } from "../../components/sanitizer"; // <-- Add this line
 
 const AuditLog = () => {
     const [logs, setLogs] = useState([]);
@@ -48,14 +49,14 @@ const AuditLog = () => {
         if (filter.trim()) {
             filtered = filtered.filter(
                 log =>
-                    log.action.toLowerCase().includes(filter.toLowerCase()) ||
-                    (log.user?.email?.toLowerCase() || "").includes(filter.toLowerCase()) ||
-                    (log.ip || "").toLowerCase().includes(filter.toLowerCase())
+                    sanitizeText(log.action).toLowerCase().includes(sanitizeText(filter).toLowerCase()) ||
+                    (sanitizeText(log.user?.email)?.toLowerCase() || "").includes(sanitizeText(filter).toLowerCase()) ||
+                    (sanitizeText(log.ip) || "").toLowerCase().includes(sanitizeText(filter).toLowerCase())
             );
         }
         if (actionFilter.trim()) {
             filtered = filtered.filter(log =>
-                log.action.toLowerCase().includes(actionFilter.toLowerCase())
+                sanitizeText(log.action).toLowerCase().includes(sanitizeText(actionFilter).toLowerCase())
             );
         }
         if (dateFilter.trim()) {
@@ -97,7 +98,8 @@ const AuditLog = () => {
 
     const formatUserAgent = (userAgent) => {
         if (!userAgent) return "—";
-        const match = userAgent.match(/(Chrome|Firefox|Safari|Edge)\/[\d.]+/);
+        const safeUserAgent = sanitizeText(userAgent);
+        const match = safeUserAgent.match(/(Chrome|Firefox|Safari|Edge)\/[\d.]+/);
         return match ? match[0] : "Unknown Browser";
     };
 
@@ -107,7 +109,7 @@ const AuditLog = () => {
         setDateFilter("");
     };
 
-    const uniqueActions = [...new Set(logs.map(log => log.action))];
+    const uniqueActions = [...new Set(logs.map(log => sanitizeText(log.action)))];
 
     return (
         <div className="h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 flex overflow-hidden">
@@ -157,7 +159,7 @@ const AuditLog = () => {
                                 <input
                                     className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-white/20 bg-white/10 text-white placeholder-white/70 focus:border-white/40 focus:ring-4 focus:ring-white/10 outline-none transition-all duration-300"
                                     value={filter}
-                                    onChange={e => setFilter(e.target.value)}
+                                    onChange={e => setFilter(sanitizeText(e.target.value))}
                                     placeholder="Search by user, action, IP..."
                                 />
                                 <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70" />
@@ -168,7 +170,7 @@ const AuditLog = () => {
                                 <select
                                     className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-white/20 bg-white/10 text-white focus:border-white/40 focus:ring-4 focus:ring-white/10 outline-none appearance-none transition-all duration-300"
                                     value={actionFilter}
-                                    onChange={e => setActionFilter(e.target.value)}
+                                    onChange={e => setActionFilter(sanitizeText(e.target.value))}
                                 >
                                     <option value="" className="bg-gray-800 text-white">All Actions</option>
                                     {uniqueActions.map(action => (
@@ -184,7 +186,7 @@ const AuditLog = () => {
                                     type="date"
                                     className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-white/20 bg-white/10 text-white focus:border-white/40 focus:ring-4 focus:ring-white/10 outline-none transition-all duration-300"
                                     value={dateFilter}
-                                    onChange={e => setDateFilter(e.target.value)}
+                                    onChange={e => setDateFilter(sanitizeText(e.target.value))}
                                 />
                                 <FontAwesomeIcon icon={faCalendarAlt} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70" />
                             </div>
@@ -262,16 +264,16 @@ const AuditLog = () => {
                                                     <td className="px-6 py-4 text-sm text-gray-300">
                                                         <div className="flex items-center gap-2">
                                                             <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm">
-                                                                {log.user?.email?.charAt(0).toUpperCase() || "?"}
+                                                                {sanitizeText(log.user?.email?.charAt(0).toUpperCase()) || "?"}
                                                             </div>
                                                             <span className="truncate max-w-xs">
-                                                                {log.user?.email || "Unknown User"}
+                                                                {sanitizeText(log.user?.email) || "Unknown User"}
                                                             </span>
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 text-sm whitespace-nowrap">
-                                                        <span className={`px-3 py-1 rounded-full text-xs font-medium border shadow-sm ${getActionBadgeColor(log.action)}`}>
-                                                            {log.action}
+                                                        <span className={`px-3 py-1 rounded-full text-xs font-medium border shadow-sm ${getActionBadgeColor(sanitizeText(log.action))}`}>
+                                                            {sanitizeText(log.action)}
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 text-sm text-gray-300 max-w-xs">
@@ -285,7 +287,7 @@ const AuditLog = () => {
                                                     <td className="px-6 py-4 text-xs text-gray-400">
                                                         <div className="space-y-1">
                                                             <div className="font-mono text-xs bg-gray-800 px-2 py-1 rounded shadow-sm">
-                                                                {log.ip || "—"}
+                                                                {sanitizeText(log.ip) || "—"}
                                                             </div>
                                                             <div className="truncate max-w-xs">
                                                                 {formatUserAgent(log.userAgent)}
@@ -323,7 +325,7 @@ const AuditLog = () => {
                                                                             User Agent
                                                                         </h5>
                                                                         <p className="bg-gray-900 p-3 rounded-lg text-xs border break-all shadow-inner max-h-40 overflow-auto resize-none">
-                                                                            {log.userAgent || "Not available"}
+                                                                            {sanitizeText(log.userAgent) || "Not available"}
                                                                         </p>
                                                                     </div>
                                                                 </div>
