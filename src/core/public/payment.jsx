@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Footer from "../../components/footer.jsx";
 import Sidebar from "../../components/sidebar.jsx";
+import { sanitizeText } from "../../components/sanitizer"; // <-- Import sanitizer
 
 const SupportPayment = () => {
   const navigate = useNavigate();
@@ -62,10 +63,12 @@ const SupportPayment = () => {
     }
   }, [location, navigate]);
 
-  // Fetch a fresh CSRF token
+  // Fetch a fresh CSRF token, then wait for the cookie to be set
   async function getFreshCsrfToken() {
     const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
     const { csrfToken } = await res.json();
+    // Wait for cookie to be set (important for localhost/setup)
+    await new Promise((resolve) => setTimeout(resolve, 100));
     return csrfToken;
   }
 
@@ -79,17 +82,24 @@ const SupportPayment = () => {
       return;
     }
 
+    // Sanitize user input!
+    const safeNameOrSocial = sanitizeText(nameOrSocial);
+    const safeMessage = sanitizeText(message);
+
     // Store donation details in localStorage before initiating payment
     const donationData = {
       amount,
-      nameOrSocial,
-      message,
+      nameOrSocial: safeNameOrSocial,
+      message: safeMessage,
     };
     console.log("Storing donation data in localStorage:", donationData);
     localStorage.setItem("pendingDonation", JSON.stringify(donationData));
 
     try {
       const csrfToken = await getFreshCsrfToken();
+
+      // Log cookies for debugging
+      console.log("Cookies before POST:", document.cookie);
 
       const response = await fetch(`https://localhost:3000/api/esewa/donate`, {
         method: "POST",
@@ -99,8 +109,8 @@ const SupportPayment = () => {
         },
         body: JSON.stringify({
           amount,
-          nameOrSocial,
-          message,
+          nameOrSocial: safeNameOrSocial,
+          message: safeMessage,
           success_url: `https://localhost:3000/api/esewa/success?redirect=/success`,
           failure_url: `https://localhost:3000/api/esewa/failure?redirect=/payment?payment=failure`,
         }),
