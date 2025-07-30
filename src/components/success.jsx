@@ -1,32 +1,36 @@
 import React, { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import eSewaIcon from "../assets/images/esewa.jpg";
+import tickGif from "../assets/images/tick.gif"; // <-- Correct way to import gif
+import { sanitizeText } from "../components/sanitizer";
 
 const Success = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
-  // CSRF helper
+  // CSRF helper (with small delay)
   async function getFreshCsrfToken() {
     const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
     const { csrfToken } = await res.json();
+    await new Promise((resolve) => setTimeout(resolve, 100));
     return csrfToken;
   }
 
   useEffect(() => {
     const saveSupportRecord = async () => {
-      // Retrieve donation data from localStorage
       const donationData = JSON.parse(localStorage.getItem("pendingDonation"));
-
       if (!donationData) {
         console.log("No donation data found in localStorage");
         return;
       }
+      const safeDonationData = {
+        amount: donationData.amount,
+        nameOrSocial: sanitizeText(donationData.nameOrSocial),
+        message: sanitizeText(donationData.message),
+      };
 
-      console.log("Attempting to save support record:", donationData);
       try {
         const csrfToken = await getFreshCsrfToken();
-        const response = await fetch("https://localhost:3000/api/support", {
+        await fetch("https://localhost:3000/api/support", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -34,16 +38,8 @@ const Success = () => {
             "X-CSRF-Token": csrfToken,
           },
           credentials: "include",
-          body: JSON.stringify(donationData),
+          body: JSON.stringify(safeDonationData),
         });
-
-        const result = await response.json();
-        if (!response.ok) {
-          throw new Error(result.message || "Failed to save support record");
-        }
-
-        console.log("Support record saved successfully:", result);
-        // Clear donation data from localStorage after saving
         localStorage.removeItem("pendingDonation");
       } catch (error) {
         console.error("Error saving support record:", error);
@@ -52,7 +48,6 @@ const Success = () => {
 
     saveSupportRecord();
 
-    // Redirect to dashboard after 5 seconds
     const timer = setTimeout(() => {
       navigate("/dashboard");
     }, 5000);
@@ -71,9 +66,10 @@ const Success = () => {
         <h2 className="text-3xl font-bold text-green-400">Payment Success!</h2>
         <p className="text-gray-300 mt-2">
           <img
-            src="../src/assets/images/tick.gif"
+            src={tickGif}
             alt="Success"
             className="w-96 h-64 object-cover rounded-lg shadow-md"
+            onError={e => { e.target.src = "https://media.tenor.com/1cWv2t3r1r8AAAAC/check.gif"; }}
           />
         </p>
         <p className="text-orange-400 mt-4 text-lg font-bold">
