@@ -26,7 +26,7 @@ export default function Profile() {
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
 
-    // Fetch user profile with cookies
+  
     useEffect(() => {
         const fetchProfile = async () => {
             try {
@@ -73,13 +73,13 @@ export default function Profile() {
         }
     }, [image]);
 
-    // Security - handle password strength meter
+  
     const handleNewPasswordChange = (e) => {
         setNewPassword(e.target.value);
         setPasswordScore(zxcvbn(e.target.value).score);
     };
 
-    // File upload security: only allow images, max 2MB
+
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -96,10 +96,10 @@ export default function Profile() {
         }
     };
 
-    // Secure password change
+
     const handlePasswordChange = async () => {
         setError("");
-        // Sanitize password inputs before sending
+      
         const safeOldPassword = sanitizeText(oldPassword);
         const safeNewPassword = sanitizeText(newPassword);
         const safeConfirmPassword = sanitizeText(confirmPassword);
@@ -116,14 +116,12 @@ export default function Profile() {
             setError("Password is too weak! Try a mix of letters, numbers, symbols, and make it longer.");
             return;
         }
-        // === CLIENT-SIDE: Prevent same password ===
+       
         if (safeOldPassword && safeNewPassword && safeOldPassword === safeNewPassword) {
             toast.error("You can't put the same password as before.", { position: "top-right", autoClose: 3000 });
             return;
         }
-        // === END CLIENT-SIDE CHECK ===
-
-        // Fetch a fresh CSRF token before the update
+       
         let freshCsrfToken = "";
         try {
             const csrfRes = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
@@ -148,14 +146,14 @@ export default function Profile() {
                 credentials: "include"
             });
 
-            // === IMPROVED ERROR HANDLING: Only redirect on 401 (unauthenticated) ===
+           
             if (response.status === 401) {
                 navigate("/login");
                 return;
             }
 
             if (response.status === 403) {
-                // Check for "Old password is incorrect."
+               
                 const errorData = await response.json();
                 if (errorData.message === "Old password is incorrect.") {
                     setError("Old password is incorrect.");
@@ -164,19 +162,19 @@ export default function Profile() {
                 setError(errorData.message || "Forbidden");
                 return;
             }
-            // === END IMPROVED HANDLING ===
+       
 
             if (!response.ok) {
                 const errorData = await response.json();
-                // === SHOW TOAST FOR SAME PASSWORD ===
+           
                 if (
                     errorData.message === "You can't set the same password as before." ||
-                    errorData.message === "You cant put same password" // accept both spellings
+                    errorData.message === "You cant put same password" 
                 ) {
                     toast.error("You can't use the same password as your old one.", { position: "top-right", autoClose: 3000 });
                     return;
                 }
-                // === END TOAST ===
+                
                 throw new Error(errorData.message || "Failed to update password");
             }
 
@@ -198,18 +196,18 @@ export default function Profile() {
         e.preventDefault();
         setError("");
 
-        // Sanitize user input before sending
+   
         const safeName = sanitizeText(user.name.trim());
         const safeEmail = sanitizeText(user.email.trim());
         const safeAbout = sanitizeText(user.about.trim());
 
-        // Input validation
+     
         if (!safeName || !safeEmail) {
             toast.error("Name and email are required.", { autoClose: 3000 });
             return;
         }
 
-        // Fetch a fresh CSRF token before the update
+     
         let freshCsrfToken = "";
         try {
             const csrfRes = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });

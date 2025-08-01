@@ -31,9 +31,9 @@ import axios from 'axios';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [authChecked, setAuthChecked] = useState(false); // <-- NEW
+  const [authChecked, setAuthChecked] = useState(false); 
 
-  // Check authentication status on mount
+  
   const checkAuth = async () => {
     try {
       const response = await axios.get('https://localhost:3000/api/auth/check-auth', {
@@ -45,7 +45,7 @@ function App() {
       setIsAuthenticated(false);
       setIsAdmin(false);
     } finally {
-      setAuthChecked(true); // <-- NEW
+      setAuthChecked(true);
     }
   };
 
@@ -53,7 +53,7 @@ function App() {
     checkAuth();
     window.addEventListener("storage", checkAuth);
     return () => window.removeEventListener("storage", checkAuth);
-    // eslint-disable-next-line
+  
   }, []);
 
   const publicRoutes = [
@@ -188,7 +188,7 @@ function App() {
   const routes = [...publicRoutes, ...privateRoutes];
   const router = createBrowserRouter(routes);
 
-  // Only render the router after auth check is complete!
+ 
   if (!authChecked) {
     return <div>Loading...</div>;
   }

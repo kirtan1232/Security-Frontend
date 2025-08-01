@@ -22,8 +22,7 @@ const LoginPage = ({ setIsAuthenticated, setIsAdmin }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Remove initial auth check to prevent showing tokens before login
-        // CSRF token will be fetched only on login attempt
+ 
     }, []);
 
     const handleSignUpClick = () => {
@@ -36,7 +35,7 @@ const LoginPage = ({ setIsAuthenticated, setIsAdmin }) => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        // Sanitize user inputs
+     
         const safeEmail = sanitizeText(email);
         const safePassword = sanitizeText(password);
     
@@ -52,7 +51,7 @@ const LoginPage = ({ setIsAuthenticated, setIsAdmin }) => {
         setLoading(true);
     
         try {
-            // Fetch CSRF token before login attempt
+        
             const csrfResponse = await axios.get(`${API_URL}/csrf-token`, { withCredentials: true });
             const csrfToken = csrfResponse.data.csrfToken;
     
@@ -68,7 +67,7 @@ const LoginPage = ({ setIsAuthenticated, setIsAdmin }) => {
             
             const { token, role, passwordLastChanged } = response.data;
             
-            // Check password expiry (30 days)
+  
             if (passwordLastChanged) {
                 const passwordExpiryDays = 30;
                 const lastChanged = new Date(passwordLastChanged);
@@ -82,7 +81,7 @@ const LoginPage = ({ setIsAuthenticated, setIsAdmin }) => {
                 }
             }
 
-            // Tokens are set in backend cookies, so no need to set them here
+    
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             setIsAuthenticated(true);
             setIsAdmin(role === "admin");

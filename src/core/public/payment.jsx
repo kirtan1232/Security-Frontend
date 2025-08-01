@@ -15,7 +15,7 @@ const SupportPayment = () => {
   const [message, setMessage] = useState("");
   const [amount, setAmount] = useState(10);
 
-  // Fetch user profile
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -42,7 +42,7 @@ const SupportPayment = () => {
     fetchUserProfile();
   }, []);
 
-  // Check for payment status on component mount and location change
+
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const paymentStatus = searchParams.get("payment");
@@ -57,17 +57,17 @@ const SupportPayment = () => {
         draggable: true,
         progress: undefined,
       });
-      // Clear donation data from localStorage on failure
+    
       localStorage.removeItem("pendingDonation");
       navigate("/dashboard", { replace: true });
     }
   }, [location, navigate]);
 
-  // Fetch a fresh CSRF token, then wait for the cookie to be set
+
   async function getFreshCsrfToken() {
     const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
     const { csrfToken } = await res.json();
-    // Wait for cookie to be set (important for localhost/setup)
+
     await new Promise((resolve) => setTimeout(resolve, 100));
     return csrfToken;
   }
@@ -82,11 +82,11 @@ const SupportPayment = () => {
       return;
     }
 
-    // Sanitize user input!
+   
     const safeNameOrSocial = sanitizeText(nameOrSocial);
     const safeMessage = sanitizeText(message);
 
-    // Store donation details in localStorage before initiating payment
+  
     const donationData = {
       amount,
       nameOrSocial: safeNameOrSocial,
@@ -98,7 +98,7 @@ const SupportPayment = () => {
     try {
       const csrfToken = await getFreshCsrfToken();
 
-      // Log cookies for debugging
+     
       console.log("Cookies before POST:", document.cookie);
 
       const response = await fetch(`https://localhost:3000/api/esewa/donate`, {

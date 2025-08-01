@@ -2,9 +2,9 @@ import DOMPurify from "dompurify";
 
 /**
  * Sanitize HTML content to prevent XSS attacks
- * @param {string} dirty - The potentially unsafe HTML content
- * @param {Object} options - Configuration options for DOMPurify
- * @returns {string} - Sanitized HTML content
+ * @param {string} dirty 
+ * @param {Object} options 
+ * @returns {string} 
  */
 export const sanitizeHTML = (dirty, options = {}) => {
   if (!dirty || typeof dirty !== "string") {
@@ -218,15 +218,15 @@ export const sanitizeFormData = (formData) => {
     const value = formData[key];
 
     if (typeof value === "string") {
-      // For most form fields, we want to preserve text but remove HTML
+      
       sanitized[key] = sanitizeText(value);
     } else if (Array.isArray(value)) {
-      // For arrays, sanitize each string element
+      
       sanitized[key] = value.map((item) =>
         typeof item === "string" ? sanitizeText(item) : item
       );
     } else {
-      // For other types, keep as is (numbers, booleans, etc.)
+      
       sanitized[key] = value;
     }
   });
@@ -234,5 +234,5 @@ export const sanitizeFormData = (formData) => {
   return sanitized;
 };
 
-// Export DOMPurify instance for advanced use cases
+
 export { DOMPurify };

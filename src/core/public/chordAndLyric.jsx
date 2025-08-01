@@ -15,26 +15,26 @@ export default function ChordAndLyric() {
     const [showLikeAnimation, setShowLikeAnimation] = useState(null);
     const navigate = useNavigate();
 
-    // Function to get song image using Lorem Picsum (reliable alternative)
+
     const getSongImage = (songName) => {
-        // Create a deterministic but varied image based on song name
+      
         const songHash = songName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        const imageId = (songHash % 1000) + 1; // Ensure positive number
+        const imageId = (songHash % 1000) + 1; 
         
-        // Use Lorem Picsum with a seeded random number for consistency
+     
         return `https://picsum.photos/400/300?random=${imageId}`;
     };
 
-    // Enhanced error handler for images
+ 
     const handleImageError = (e, songName) => {
         const target = e.target;
         
-        // First fallback: try a different Picsum image
+
         if (target.src.includes('picsum.photos')) {
             const newId = Math.floor(Math.random() * 1000) + 1;
             target.src = `https://picsum.photos/400/300?random=${newId}`;
         } else {
-            // Final fallback: use a beautiful SVG placeholder
+ 
             target.src = `data:image/svg+xml,${encodeURIComponent(
                 `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
                     <defs>
@@ -124,7 +124,7 @@ export default function ChordAndLyric() {
         fetchLikedSongs();
     }, []);
 
-    // Fetch a fresh CSRF token for mutating requests
+ 
     async function getFreshCsrfToken() {
         const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
         const { csrfToken } = await res.json();
@@ -135,12 +135,12 @@ export default function ChordAndLyric() {
         e.preventDefault();
         e.stopPropagation();
 
-        // Show animation
+
         setShowLikeAnimation(songId);
         setTimeout(() => setShowLikeAnimation(null), 1000);
 
         try {
-            // Get fresh CSRF token
+        
             const csrfToken = await getFreshCsrfToken();
             const isLiked = likedSongs.includes(songId.toString());
             const response = await fetch(`https://localhost:3000/api/favorites/songs`, {
@@ -163,7 +163,7 @@ export default function ChordAndLyric() {
             const data = await response.json();
             const updatedSongIds = data.favorite.songIds.map(id => id.toString());
             setLikedSongs(updatedSongIds);
-            // Optionally, show toast or notification.
+          
         } catch (error) {
             console.error("Error in handleLikeSong:", error);
             alert(`Error toggling favorite: ${error.message}`);
@@ -204,7 +204,7 @@ export default function ChordAndLyric() {
 
     return (
         <div className="bg-gradient-to-br min-h-screen flex flex-col from-gray-900 via-indigo-900 to-purple-900">
-            {/* Animated background elements */}
+        
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-10 left-10 w-64 h-64 bg-purple-800 rounded-full opacity-20 animate-pulse"></div>
                 <div className="absolute bottom-10 right-10 w-48 h-48 bg-blue-800 rounded-full opacity-20 animate-pulse delay-1000"></div>
@@ -216,7 +216,7 @@ export default function ChordAndLyric() {
                 <main className="flex-1 p-6 flex justify-center items-start mt-4">
                     <div className="bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-700/50 p-8 w-full max-w-7xl h-[85vh] overflow-y-auto">
                         
-                        {/* Stats Section - Only Available Songs and Search Results */}
+                   
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                             <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl p-4 text-center">
                                 <div className="flex items-center justify-center mb-2">
@@ -234,7 +234,7 @@ export default function ChordAndLyric() {
                             </div>
                         </div>
 
-                        {/* Search Bar */}
+    
                         <div className="relative mb-8">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                                 <FaSearch className="text-lg text-gray-300" />
@@ -248,7 +248,7 @@ export default function ChordAndLyric() {
                             />
                         </div>
 
-                        {/* Instrument Selection */}
+
                         <div className="flex justify-center mb-8">
                             <div className="flex bg-gray-700/50 rounded-2xl p-2 shadow-lg backdrop-blur-sm">
                                 {["Guitar", "Piano", "Ukulele"].map((category) => (
@@ -270,7 +270,7 @@ export default function ChordAndLyric() {
                             </div>
                         </div>
 
-                        {/* Songs Grid */}
+     
                         <div className="space-y-4">
                             {filteredSongs.length === 0 ? (
                                 <div className="text-center py-16">

@@ -137,7 +137,7 @@ export default function LessonDetails() {
     setShowFeedback(false);
   };
 
-  // Fetch a fresh CSRF token for POST
+ 
   async function getFreshCsrfToken() {
     const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
     const { csrfToken } = await res.json();

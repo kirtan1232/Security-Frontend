@@ -19,7 +19,7 @@ const SongDetails = () => {
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
-                // Use only cookies (no Authorization header, no localStorage)
+           
                 const response = await axios.get("https://localhost:3000/api/auth/profile", {
                     withCredentials: true,
                 });

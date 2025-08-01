@@ -15,7 +15,7 @@ export default function PracticeSession() {
   const [hoveredDay, setHoveredDay] = useState(null);
   const [showCelebration, setShowCelebration] = useState(false);
 
-  // CSRF helper
+
   async function getFreshCsrfToken() {
     const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
     const { csrfToken } = await res.json();
@@ -106,7 +106,7 @@ export default function PracticeSession() {
 
   const isDayAccessible = (day) => {
     if (!day || uniqueDays.length === 0) return false;
-    if (day === uniqueDays[0]) return true; // First day is always accessible
+    if (day === uniqueDays[0]) return true; 
     const currentIndex = uniqueDays.indexOf(day);
     if (currentIndex === -1) return false;
     const previousDay = uniqueDays[currentIndex - 1];

@@ -18,14 +18,13 @@ const ViewChords = () => {
         fetchSongs();
     }, []);
 
-    // CSRF helper (if needed for song edit/delete)
     async function getFreshCsrfToken() {
         const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
         const { csrfToken } = await res.json();
         return csrfToken;
     }
 
-    // Fetch songs using cookie-based authentication (no localStorage, no Authorization header)
+
     const fetchSongs = async () => {
         setLoading(true);
         try {

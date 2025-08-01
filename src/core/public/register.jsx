@@ -6,7 +6,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import zxcvbn from "zxcvbn";
-import { sanitizeText } from "../../components/sanitizer"; // <-- Add this line
+import { sanitizeText } from "../../components/sanitizer";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -107,7 +107,7 @@ const RegisterPage = () => {
                 <div className="w-1/2 p-12 flex flex-col justify-center">
                     <div className="max-w-md mx-auto w-full">
                         <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-4 text-center">
-                            Join Anna
+                            Join SoundWise
                         </h2>
                         <p className="text-gray-300 mb-8 text-center text-lg">
                             Hey, Enter your details to create<br />

@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import logoImage from "../../assets/images/logo.png";
 import { useNavigate } from "react-router-dom";
 import zxcvbn from "zxcvbn";
-import { sanitizeText } from "../../components/sanitizer"; // <-- Import sanitizer
+import { sanitizeText } from "../../components/sanitizer"; 
 
 const ResetPasswordPage = () => {
     const [token, setToken] = useState('');
@@ -19,7 +19,7 @@ const ResetPasswordPage = () => {
     const [passwordScore, setPasswordScore] = useState(0);
     const navigate = useNavigate();
 
-    // Generate stable bubbles
+ 
     const bubbles = useMemo(() => {
         const bubbleCount = 5;
         return Array.from({ length: bubbleCount }).map((_, i) => ({

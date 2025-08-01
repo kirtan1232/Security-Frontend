@@ -6,14 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logoImage from "../../assets/images/logo.png";
-import { sanitizeText } from "../../components/sanitizer"; // <-- Import sanitizer
+import { sanitizeText } from "../../components/sanitizer"; 
 
 const ForgetPassword = () => {
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    // Use useMemo to prevent recreation of bubbles on re-render
     const bubbles = useMemo(() => {
         const bubbleCount = 5;
         return Array.from({ length: bubbleCount }).map((_, i) => ({
@@ -25,9 +24,9 @@ const ForgetPassword = () => {
             duration: Math.random() * 20 + 10,
             delay: Math.random() * 5
         }));
-    }, []); // Empty dependency array means this only runs once
+    }, []); 
 
-    // CSRF helper
+
     async function getFreshCsrfToken() {
         const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
         const { csrfToken } = await res.json();
@@ -38,7 +37,7 @@ const ForgetPassword = () => {
         e.preventDefault();
         setLoading(true);
 
-        const safeEmail = sanitizeText(email); // Sanitize input
+        const safeEmail = sanitizeText(email); 
 
         if (!safeEmail) {
             toast.error("Please enter your email.", {
@@ -53,7 +52,7 @@ const ForgetPassword = () => {
             const csrfToken = await getFreshCsrfToken();
             const response = await axios.post(
                 'https://localhost:3000/api/auth/forgotPassword',
-                { email: safeEmail }, // Use sanitized email
+                { email: safeEmail },
                 {
                     headers: {
                         "X-CSRF-Token": csrfToken
@@ -65,7 +64,7 @@ const ForgetPassword = () => {
                 position: "top-right",
                 autoClose: 1500,
             });
-            navigate("/login"); // <-- Ensure this is /login, not /dashboard
+            navigate("/login"); 
         } catch (error) {
             console.error('Error:', error);
             const errorMsg = error.response?.data?.msg;
@@ -205,7 +204,7 @@ const ForgetPassword = () => {
                         </div>
                     </div>
                 </div>
-                {/* Right Section - Illustration */}
+            
                 <div className="w-1/2 bg-gradient-to-br from-indigo-800 via-purple-800 to-indigo-900 flex items-center justify-center relative overflow-hidden">
                     <div className="absolute inset-0 opacity-10">
                         <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full animate-pulse"></div>

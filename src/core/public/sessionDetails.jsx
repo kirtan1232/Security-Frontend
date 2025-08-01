@@ -121,7 +121,7 @@ export default function SessionDetails() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Fetch a fresh CSRF token for mutating requests
+ 
   async function getFreshCsrfToken() {
     const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
     const { csrfToken } = await res.json();

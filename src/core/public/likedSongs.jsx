@@ -12,7 +12,7 @@ export default function LikedSongs() {
     const [userProfile, setUserProfile] = useState(null);
     const navigate = useNavigate();
 
-    // Fetch liked songs (GET)
+   
     const fetchLikedSongs = async () => {
         try {
             const response = await fetch("https://localhost:3000/api/favorites/getfav", {
@@ -66,13 +66,13 @@ export default function LikedSongs() {
         fetchLikedSongs();
     }, []);
 
-    // Unlike a song (POST - needs CSRF)
+
     const handleUnlikeSong = async (songId) => {
         try {
-            // Optimistic update: remove locally
+      
             setLikedSongs(prev => prev.filter(song => song._id.toString() !== songId));
 
-            // Fetch a fresh CSRF token
+      
             const csrfRes = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
             const { csrfToken } = await csrfRes.json();
 
@@ -108,7 +108,6 @@ export default function LikedSongs() {
 
     return (
         <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900">
-            {/* Animated background elements */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-10 left-10 w-64 h-64 bg-purple-800 rounded-full opacity-20 animate-pulse"></div>
                 <div className="absolute bottom-10 right-10 w-48 h-48 bg-blue-800 rounded-full opacity-20 animate-pulse delay-1000"></div>

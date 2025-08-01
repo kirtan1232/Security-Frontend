@@ -30,7 +30,6 @@ const ViewPracticeSessions = () => {
         return csrfToken;
     }
 
-    // Fetch sessions using cookie-based authentication (no localStorage, no Authorization header)
     const fetchSessions = async () => {
         setLoading(true);
         try {

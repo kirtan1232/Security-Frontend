@@ -1,9 +1,8 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../../components/footer.jsx";
 import Sidebar from "../../components/sidebar.jsx";
-import Cookies from "js-cookie";
-import axios from "axios";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -13,23 +12,26 @@ export default function Dashboard() {
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
 
-  // Fetch the user profile on mount
   useEffect(() => {
-    let isMounted = true; // Prevent setting state after unmount
+    let isMounted = true;
     const fetchUserProfile = async () => {
       setLoadingProfile(true);
       setProfileError("");
       try {
-        // Use axios with cookies
-        const response = await axios.get("https://localhost:3000/api/auth/profile", {
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          "https://localhost:3000/api/auth/profile",
+          {
+            withCredentials: true,
+          }
+        );
 
         if (!isMounted) return;
 
         setUserProfile(response.data);
         if (response.data.profilePicture) {
-          setImagePreview(`https://localhost:3000/${response.data.profilePicture}`);
+          setImagePreview(
+            `https://localhost:3000/${response.data.profilePicture}`
+          );
         }
       } catch (error) {
         if (!isMounted) return;
@@ -65,17 +67,14 @@ export default function Dashboard() {
     }
   };
 
-  // Handle navigation on profile picture click
   const handleProfilePictureClick = () => {
     if (userProfile) {
       navigate("/profile");
     }
-    // If not authenticated, profileError UI will already be visible
   };
 
   const handleNavigation = (path) => {
     if (!userProfile) {
-      // Not authenticated, show error UI
       setProfileError("Not authenticated. Please login.");
     } else {
       navigate(path);
@@ -238,7 +237,8 @@ export default function Dashboard() {
                       Play along song with chords
                     </h2>
                     <p className="text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
-                      Practice with your favorite songs and improve your chord transitions
+                      Practice with your favorite songs and improve your chord
+                      transitions
                     </p>
                   </div>
                   <div className="absolute top-6 right-6 w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">

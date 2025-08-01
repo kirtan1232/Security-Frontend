@@ -12,7 +12,7 @@ const OtpPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // userId passed via state after registration or login error
+  
     const userId = location.state?.userId;
 
     const handleChange = (e, idx) => {
@@ -22,11 +22,11 @@ const OtpPage = () => {
         newOtp[idx] = value;
         setOtp(newOtp);
 
-        // Move to next input if filled
+      
         if (value && idx < 5) {
             document.getElementById(`otp-input-${idx + 1}`).focus();
         }
-        // Move to previous input if deleted
+       
         if (!value && idx > 0) {
             document.getElementById(`otp-input-${idx - 1}`).focus();
         }
@@ -40,7 +40,7 @@ const OtpPage = () => {
         }
         setLoading(true);
         try {
-            // Fetch fresh CSRF token before POST
+          
             const csrfRes = await axios.get(`${API_URL}/csrf-token`, { withCredentials: true });
             const csrfToken = csrfRes.data.csrfToken;
 
@@ -54,7 +54,7 @@ const OtpPage = () => {
                 }
             );
             toast.success("Email verified!");
-            // Optionally: auto-login after verification, or redirect to login
+         
             setTimeout(() => navigate("/login"), 1500);
         } catch (err) {
             toast.error(err.response?.data?.message || "Invalid OTP. Try again.");
