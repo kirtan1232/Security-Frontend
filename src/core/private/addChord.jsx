@@ -41,7 +41,7 @@ const AddChord = () => {
                         const lyricsLines = parseDocxText(extractedText);
                         updateLyricsWithDocx(index, lyricsLines);
                     })
-                    .catch((err) => console.log("Error parsing DOCX:", err));
+                    .catch((err) => {});
             };
             reader.readAsArrayBuffer(file);
         });

@@ -21,7 +21,6 @@ import RegisterPage from "./core/public/register.jsx";
 import ResetPasswordPage from "./core/public/resetPassword.jsx";
 import SessionDetails from "./core/public/sessionDetails.jsx";
 import SongDetails from "./core/public/songDetails.jsx";
-import TunerInst from "./core/public/tunerInst.jsx";
 import Success from "./components/success.jsx";
 import Payment from "./core/public/payment.jsx";
 import OtpPage from "./core/public/otp.jsx";
@@ -75,7 +74,6 @@ function App() {
     { path: "/practiceSessions", element: <PracticeSession /> },
     { path: "/chords", element: <ChordAndLyricPage /> },
     { path: "/song/:songId", element: <SongDetails /> },
-    { path: "/tuner", element: <TunerInst /> },
     { path: "/profile", element: <Profile /> },
     { path: "/session-details/:day/:instrument", element: <SessionDetails /> },
     { path: "/lesson/:instrument/:day", element: <LessonDetails /> },

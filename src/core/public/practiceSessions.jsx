@@ -1,10 +1,18 @@
 import React, { useEffect, useState } from "react";
+import {
+  FaCheckCircle,
+  FaGuitar,
+  FaLock,
+  FaMusic,
+  FaPlay,
+  FaStar,
+  FaTrophy,
+} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../../components/sidebar.jsx";
-import { FaCheckCircle, FaLock, FaGuitar, FaMusic, FaPlay, FaTrophy, FaStar } from "react-icons/fa";
-import Footer from "../../components/footer.jsx";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Footer from "../../components/footer.jsx";
+import Header from "../../components/header.jsx";
 
 export default function PracticeSession() {
   const [sessions, setSessions] = useState([]);
@@ -15,9 +23,10 @@ export default function PracticeSession() {
   const [hoveredDay, setHoveredDay] = useState(null);
   const [showCelebration, setShowCelebration] = useState(false);
 
-
   async function getFreshCsrfToken() {
-    const res = await fetch("https://localhost:3000/api/csrf-token", { credentials: "include" });
+    const res = await fetch("https://localhost:3000/api/csrf-token", {
+      credentials: "include",
+    });
     const { csrfToken } = await res.json();
     return csrfToken;
   }
@@ -25,14 +34,17 @@ export default function PracticeSession() {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await fetch("https://localhost:3000/api/auth/profile", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          credentials: "include"
-        });
+        const response = await fetch(
+          "https://localhost:3000/api/auth/profile",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            credentials: "include",
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Failed to fetch profile");
@@ -66,14 +78,17 @@ export default function PracticeSession() {
 
     const fetchCompletedSessions = async () => {
       try {
-        const response = await fetch("https://localhost:3000/api/completed-sessions/getcompleted", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          credentials: "include"
-        });
+        const response = await fetch(
+          "https://localhost:3000/api/completed-sessions/getcompleted",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            credentials: "include",
+          }
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch completed sessions");
         }
@@ -92,25 +107,34 @@ export default function PracticeSession() {
     fetchCompletedSessions();
   }, []);
 
-  const filteredSessions = sessions.filter((session) => session.instrument === selectedInstrument);
-  const uniqueDays = [...new Set(filteredSessions.map((session) => session.day))].sort((a, b) => {
+  const filteredSessions = sessions.filter(
+    (session) => session.instrument === selectedInstrument
+  );
+  const uniqueDays = [
+    ...new Set(filteredSessions.map((session) => session.day)),
+  ].sort((a, b) => {
     const dayA = parseInt(a.replace("Day ", ""));
     const dayB = parseInt(b.replace("Day ", ""));
     return dayA - dayB;
   });
   const totalDays = uniqueDays.length;
   const completedDays = uniqueDays.filter((day) =>
-    completedSessions.some((s) => s.day === day && s.instrument === selectedInstrument)
+    completedSessions.some(
+      (s) => s.day === day && s.instrument === selectedInstrument
+    )
   ).length;
-  const completionPercentage = totalDays > 0 ? (completedDays / totalDays) * 100 : 0;
+  const completionPercentage =
+    totalDays > 0 ? (completedDays / totalDays) * 100 : 0;
 
   const isDayAccessible = (day) => {
     if (!day || uniqueDays.length === 0) return false;
-    if (day === uniqueDays[0]) return true; 
+    if (day === uniqueDays[0]) return true;
     const currentIndex = uniqueDays.indexOf(day);
     if (currentIndex === -1) return false;
     const previousDay = uniqueDays[currentIndex - 1];
-    return completedSessions.some((s) => s.day === previousDay && s.instrument === selectedInstrument);
+    return completedSessions.some(
+      (s) => s.day === previousDay && s.instrument === selectedInstrument
+    );
   };
 
   const handleDayClick = (day) => {
@@ -125,7 +149,9 @@ export default function PracticeSession() {
   };
 
   const isDayCompleted = (day) => {
-    return completedSessions.some((s) => s.day === day && s.instrument === selectedInstrument);
+    return completedSessions.some(
+      (s) => s.day === day && s.instrument === selectedInstrument
+    );
   };
 
   const getInstrumentIcon = (instrument) => {
@@ -163,6 +189,9 @@ export default function PracticeSession() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900">
+      {/* Header */}
+      <Header />
+
       {/* Animated background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-10 left-10 w-64 h-64 bg-purple-800 rounded-full opacity-20 animate-pulse"></div>
@@ -170,226 +199,233 @@ export default function PracticeSession() {
         <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-pink-800 rounded-full opacity-20 animate-pulse delay-2000"></div>
       </div>
 
-      <div className="relative flex flex-1 z-10">
-        <Sidebar />
-        <main className="flex-1 p-6 flex justify-center items-start mt-4">
-          <div className="bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-700/50 p-8 w-full max-w-7xl h-[85vh] overflow-y-auto">
-            
-            {/* Header Section */}
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 mb-4 animate-pulse">
-                <FaPlay className="text-white text-2xl" />
-              </div>
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
-                Practice Sessions
-              </h2>
-              <p className="text-xl text-gray-300">
-                Master your {selectedInstrument} skills
-              </p>
+      {/* Main Content */}
+      <main className="flex-1 p-6 flex justify-center items-start mt-4 relative z-10">
+        <div className="bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-700/50 p-8 w-full max-w-7xl h-[85vh] overflow-y-auto">
+          {/* Header Section */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 mb-4 animate-pulse">
+              <FaPlay className="text-white text-2xl" />
             </div>
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
+              Practice Sessions
+            </h2>
+            <p className="text-xl text-gray-300">
+              Master your {selectedInstrument} skills
+            </p>
+          </div>
 
-            {/* Instrument Selection */}
-            <div className="flex justify-center mb-8">
-              <div className="flex bg-gray-700/50 rounded-2xl p-2 shadow-lg backdrop-blur-sm">
-                {["Guitar", "Piano", "Ukulele"].map((instrument) => (
-                  <button
-                    key={instrument}
-                    onClick={() => setSelectedInstrument(instrument)}
-                    className={`flex items-center px-6 py-3 rounded-xl transition-all duration-300 transform hover:scale-105 ${
-                      selectedInstrument === instrument
-                        ? `bg-gradient-to-r ${getInstrumentGradient(instrument)} text-white shadow-lg`
-                        : "text-gray-300 hover:bg-gray-600/50"
-                    }`}
-                  >
-                    <span className="mr-2">
-                      {getInstrumentIcon(instrument)}
-                    </span>
-                    <span className="font-semibold">{instrument}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Progress Section */}
-            <div className="mb-8 p-6 bg-gradient-to-r from-gray-700/30 to-purple-900/20 rounded-2xl border-l-4 border-purple-500">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center">
-                  <FaTrophy className="text-yellow-500 text-2xl mr-3" />
-                  <h3 className="text-xl font-bold text-gray-200">
-                    Progress Tracker
-                  </h3>
-                </div>
-                {showCelebration && (
-                  <div className="flex items-center animate-bounce">
-                    <FaStar className="text-yellow-400 text-xl mr-1" />
-                    <span className="text-lg font-bold text-yellow-400">All Complete! 🎉</span>
-                  </div>
-                )}
-              </div>
-              
-              <div className="relative w-full h-4 bg-gray-600 rounded-full overflow-hidden shadow-inner">
-                <div
-                  className="h-full bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 rounded-full transition-all duration-1000 ease-out relative"
-                  style={{ width: `${completionPercentage}%` }}
+          {/* Instrument Selection */}
+          <div className="flex justify-center mb-8">
+            <div className="flex bg-gray-700/50 rounded-2xl p-2 shadow-lg backdrop-blur-sm">
+              {["Guitar", "Piano", "Ukulele"].map((instrument) => (
+                <button
+                  key={instrument}
+                  onClick={() => setSelectedInstrument(instrument)}
+                  className={`flex items-center px-6 py-3 rounded-xl transition-all duration-300 transform hover:scale-105 ${
+                    selectedInstrument === instrument
+                      ? `bg-gradient-to-r ${getInstrumentGradient(
+                          instrument
+                        )} text-white shadow-lg`
+                      : "text-gray-300 hover:bg-gray-600/50"
+                  }`}
                 >
-                  <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse"></div>
-                </div>
-              </div>
-              
-              <div className="flex justify-between mt-2">
-                <span className="text-sm font-medium text-gray-300">
-                  {completedDays} of {totalDays} days completed
-                </span>
-                <span className="text-sm font-bold text-purple-400">
-                  {Math.round(completionPercentage)}%
-                </span>
-              </div>
-            </div>
-
-            {/* Sessions Grid with Horizontal Scroll */}
-            <div className="overflow-x-auto max-h-[calc(85vh-350px)] scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-gray-700">
-              {uniqueDays.length === 0 ? (
-                <div className="text-center py-16">
-                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-700 mb-4">
-                    <FaMusic className="text-gray-400 text-2xl" />
-                  </div>
-                  <p className="text-xl text-gray-400">
-                    No practice sessions available for this instrument.
-                  </p>
-                </div>
-              ) : (
-                <div className="flex flex-row gap-4">
-                  {uniqueDays.map((day, index) => {
-                    const accessible = isDayAccessible(day);
-                    const isCompleted = isDayCompleted(day);
-                    const dayNumber = parseInt(day.replace("Day ", ""));
-
-                    return (
-                      <div
-                        key={day}
-                        className={`group relative p-6 rounded-3xl shadow-lg transition-all duration-300 transform hover:scale-105 min-w-[250px] ${
-                          accessible
-                            ? "bg-gradient-to-br from-gray-700/80 to-gray-800/60 cursor-pointer hover:shadow-xl"
-                            : "bg-gray-700/30 cursor-not-allowed"
-                        } ${
-                          isCompleted 
-                            ? "border-2 border-green-500"
-                            : accessible 
-                              ? "border-2 border-purple-600"
-                              : "border-2 border-gray-600"
-                        }`}
-                        onClick={() => handleDayClick(day)}
-                        onMouseEnter={() => setHoveredDay(day)}
-                        onMouseLeave={() => setHoveredDay(null)}
-                        style={{
-                          animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`
-                        }}
-                      >
-                        {/* Day Number Badge */}
-                        <div className={`absolute -top-0 -right-3 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white ${
-                          isCompleted 
-                            ? "bg-gradient-to-r from-green-400 to-green-600" 
-                            : accessible 
-                              ? "bg-gradient-to-r from-purple-400 to-purple-600" 
-                              : "bg-gray-400"
-                        }`}>
-                          {dayNumber}
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex items-center justify-between mb-4">
-                          <h3 className={`text-xl font-bold transition-colors ${
-                            accessible 
-                              ? "text-gray-200 group-hover:text-purple-400" 
-                              : "text-gray-500"
-                          }`}>
-                            {day}
-                          </h3>
-                          
-                          {/* Status Icons */}
-                          <div className="flex items-center space-x-2">
-                            {isCompleted && (
-                              <div className="relative">
-                                <FaCheckCircle className="text-green-500 text-2xl animate-pulse" />
-                                <div className="absolute inset-0 animate-ping">
-                                  <FaCheckCircle className="text-green-400 text-2xl opacity-75" />
-                                </div>
-                              </div>
-                            )}
-                            {!accessible && (
-                              <FaLock className="text-gray-400 text-xl" />
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Progress Indicator */}
-                        <div className="mb-4">
-                          <div className="w-full h-2 bg-gray-600 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full transition-all duration-500 ${
-                                isCompleted 
-                                  ? "bg-gradient-to-r from-green-400 to-green-600 w-full" 
-                                  : accessible 
-                                    ? "bg-gradient-to-r from-purple-400 to-purple-600 w-1/3" 
-                                    : "bg-gray-400 w-0"
-                              }`}
-                            />
-                          </div>
-                        </div>
-
-                        {/* Action Text */}
-                        <p className={`text-sm font-medium ${
-                          isCompleted 
-                            ? "text-green-400" 
-                            : accessible 
-                              ? "text-purple-400" 
-                              : "text-gray-500"
-                        }`}>
-                          {isCompleted 
-                            ? "✓ Completed" 
-                            : accessible 
-                              ? "Ready to practice" 
-                              : "Complete previous day first"
-                          }
-                        </p>
-
-                        {/* Hover Effect */}
-                        {hoveredDay === day && accessible && (
-                          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-3xl pointer-events-none"></div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+                  <span className="mr-2">{getInstrumentIcon(instrument)}</span>
+                  <span className="font-semibold">{instrument}</span>
+                </button>
+              ))}
             </div>
           </div>
-        </main>
 
-        {/* Enhanced Profile Picture */}
-        <div className="absolute top-4 right-4">
-          <div className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-300"></div>
-            <div className="relative bg-gray-800/80 backdrop-blur-lg rounded-full p-1">
-              {userProfile && userProfile.profilePicture ? (
-                <img
-                  src={`https://localhost:3000/${userProfile.profilePicture}`}
-                  alt="Profile"
-                  className="w-16 h-16 rounded-full border-2 border-gray-600 cursor-pointer hover:scale-110 transition-transform duration-300"
-                  onClick={() => navigate("/profile")}
-                />
-              ) : (
-                <img
-                  src="/profile.png"
-                  alt="Profile"
-                  className="w-16 h-16 rounded-full border-2 border-gray-600 cursor-pointer hover:scale-110 transition-transform duration-300"
-                  onClick={() => navigate("/profile")}
-                />
+          {/* Progress Section */}
+          <div className="mb-8 p-6 bg-gradient-to-r from-gray-700/30 to-purple-900/20 rounded-2xl border-l-4 border-purple-500">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <FaTrophy className="text-yellow-500 text-2xl mr-3" />
+                <h3 className="text-xl font-bold text-gray-200">
+                  Progress Tracker
+                </h3>
+              </div>
+              {showCelebration && (
+                <div className="flex items-center animate-bounce">
+                  <FaStar className="text-yellow-400 text-xl mr-1" />
+                  <span className="text-lg font-bold text-yellow-400">
+                    All Complete! 🎉
+                  </span>
+                </div>
               )}
             </div>
+
+            <div className="relative w-full h-4 bg-gray-600 rounded-full overflow-hidden shadow-inner">
+              <div
+                className="h-full bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 rounded-full transition-all duration-1000 ease-out relative"
+                style={{ width: `${completionPercentage}%` }}
+              >
+                <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse"></div>
+              </div>
+            </div>
+
+            <div className="flex justify-between mt-2">
+              <span className="text-sm font-medium text-gray-300">
+                {completedDays} of {totalDays} days completed
+              </span>
+              <span className="text-sm font-bold text-purple-400">
+                {Math.round(completionPercentage)}%
+              </span>
+            </div>
+          </div>
+
+          {/* Sessions Grid with Horizontal Scroll */}
+          <div className="overflow-x-auto max-h-[calc(85vh-350px)] scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-gray-700">
+            {uniqueDays.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-700 mb-4">
+                  <FaMusic className="text-gray-400 text-2xl" />
+                </div>
+                <p className="text-xl text-gray-400">
+                  No practice sessions available for this instrument.
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-row gap-4">
+                {uniqueDays.map((day, index) => {
+                  const accessible = isDayAccessible(day);
+                  const isCompleted = isDayCompleted(day);
+                  const dayNumber = parseInt(day.replace("Day ", ""));
+
+                  return (
+                    <div
+                      key={day}
+                      className={`group relative p-6 rounded-3xl shadow-lg transition-all duration-300 transform hover:scale-105 min-w-[250px] ${
+                        accessible
+                          ? "bg-gradient-to-br from-gray-700/80 to-gray-800/60 cursor-pointer hover:shadow-xl"
+                          : "bg-gray-700/30 cursor-not-allowed"
+                      } ${
+                        isCompleted
+                          ? "border-2 border-green-500"
+                          : accessible
+                          ? "border-2 border-purple-600"
+                          : "border-2 border-gray-600"
+                      }`}
+                      onClick={() => handleDayClick(day)}
+                      onMouseEnter={() => setHoveredDay(day)}
+                      onMouseLeave={() => setHoveredDay(null)}
+                      style={{
+                        animation: `fadeInUp 0.6s ease-out ${
+                          index * 0.1
+                        }s both`,
+                      }}
+                    >
+                      {/* Day Number Badge */}
+                      <div
+                        className={`absolute -top-0 -right-3 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white ${
+                          isCompleted
+                            ? "bg-gradient-to-r from-green-400 to-green-600"
+                            : accessible
+                            ? "bg-gradient-to-r from-purple-400 to-purple-600"
+                            : "bg-gray-400"
+                        }`}
+                      >
+                        {dayNumber}
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex items-center justify-between mb-4">
+                        <h3
+                          className={`text-xl font-bold transition-colors ${
+                            accessible
+                              ? "text-gray-200 group-hover:text-purple-400"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          {day}
+                        </h3>
+
+                        {/* Status Icons */}
+                        <div className="flex items-center space-x-2">
+                          {isCompleted && (
+                            <div className="relative">
+                              <FaCheckCircle className="text-green-500 text-2xl animate-pulse" />
+                              <div className="absolute inset-0 animate-ping">
+                                <FaCheckCircle className="text-green-400 text-2xl opacity-75" />
+                              </div>
+                            </div>
+                          )}
+                          {!accessible && (
+                            <FaLock className="text-gray-400 text-xl" />
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Progress Indicator */}
+                      <div className="mb-4">
+                        <div className="w-full h-2 bg-gray-600 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full transition-all duration-500 ${
+                              isCompleted
+                                ? "bg-gradient-to-r from-green-400 to-green-600 w-full"
+                                : accessible
+                                ? "bg-gradient-to-r from-purple-400 to-purple-600 w-1/3"
+                                : "bg-gray-400 w-0"
+                            }`}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Action Text */}
+                      <p
+                        className={`text-sm font-medium ${
+                          isCompleted
+                            ? "text-green-400"
+                            : accessible
+                            ? "text-purple-400"
+                            : "text-gray-500"
+                        }`}
+                      >
+                        {isCompleted
+                          ? "✓ Completed"
+                          : accessible
+                          ? "Ready to practice"
+                          : "Complete previous day first"}
+                      </p>
+
+                      {/* Hover Effect */}
+                      {hoveredDay === day && accessible && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-3xl pointer-events-none"></div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+
+      {/* Enhanced Profile Picture - Positioned below header */}
+      <div className="absolute top-20 right-4 z-20">
+        <div className="relative group">
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-300"></div>
+          <div className="relative bg-gray-800/80 backdrop-blur-lg rounded-full p-1">
+            {userProfile && userProfile.profilePicture ? (
+              <img
+                src={`https://localhost:3000/${userProfile.profilePicture}`}
+                alt="Profile"
+                className="w-16 h-16 rounded-full border-2 border-gray-600 cursor-pointer hover:scale-110 transition-transform duration-300"
+                onClick={() => navigate("/profile")}
+              />
+            ) : (
+              <img
+                src="/profile.png"
+                alt="Profile"
+                className="w-16 h-16 rounded-full border-2 border-gray-600 cursor-pointer hover:scale-110 transition-transform duration-300"
+                onClick={() => navigate("/profile")}
+              />
+            )}
           </div>
         </div>
       </div>
+
       <Footer />
 
       {/* Custom CSS for animations and scrollbar */}
@@ -404,39 +440,42 @@ export default function PracticeSession() {
             transform: translateY(0);
           }
         }
-        
+
         .animate-bounce {
           animation: bounce 1s infinite;
         }
-        
+
         @keyframes bounce {
-          0%, 100% {
+          0%,
+          100% {
             transform: translateY(0);
           }
           50% {
             transform: translateY(-10px);
           }
         }
-        
+
         .animate-pulse {
           animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
-        
+
         @keyframes pulse {
-          0%, 100% {
+          0%,
+          100% {
             opacity: 1;
           }
           50% {
-            opacity: .5;
+            opacity: 0.5;
           }
         }
-        
+
         .animate-ping {
           animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
         }
-        
+
         @keyframes ping {
-          75%, 100% {
+          75%,
+          100% {
             transform: scale(2);
             opacity: 0;
           }

@@ -19,7 +19,7 @@ const Success = () => {
     const saveSupportRecord = async () => {
       const donationData = JSON.parse(localStorage.getItem("pendingDonation"));
       if (!donationData) {
-        console.log("No donation data found in localStorage");
+        
         return;
       }
       const safeDonationData = {
